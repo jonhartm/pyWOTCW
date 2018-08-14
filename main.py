@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request
-import sys
+import sys, os
+from dotenv import load_dotenv
 
 import secrets
 from clan_details import *
 
 app = Flask(__name__)
+
+load_dotenv()
 
 @app.route('/')
 def index():
