@@ -63,5 +63,6 @@ if __name__=="__main__":
         elif sys.argv[1] == "-update":
             database.GetMemberTankStats(sys.argv[2])
         else:
+            pass
     else:
         app.run(debug=True)
