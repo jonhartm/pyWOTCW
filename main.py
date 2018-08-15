@@ -25,7 +25,7 @@ def GetStats():
         SELECT
         	nickname,
         	Tanks.type,
-        	SUM(battles),
+        	ROUND((SELECT SUM(damage_dealt)/SUM(battles) FROM MemberStats WHERE account_id = Members.account_id AND battles > 0)) AS OverallAvgDmg,
         	SUM(damage_dealt)/SUM(battles) as AvgDmg,
         	ROUND(SUM(spotting)*1.0/SUM(battles),1) as AvgSpot,
             Members.attendance,
@@ -43,6 +43,8 @@ def GetStats():
             # make sure there's a key for this player
             if row[0] not in stats:
                 stats[row[0]] = {}
+            stats[row[0]]["OverallAvgDmg"] = row[2]
+            stats[row[0]]["OverallAvgDmgRank"] = GetRank(row[2], DMG_BREAKS)
             stats[row[0]][row[1]] = GetTankStats(row)
             stats[row[0]]["Attendance"] = row[5]
             stats[row[0]]["Following_Calls"] = row[6]
