@@ -4,9 +4,17 @@
   <title>I've changed things</title>
 </head>
 <body>
-  <p> Hi There </p>
-  <p> If this shows up, things are working</p>
+  <table>
   {% for row in members %}
-    <p>{{row}}</p>
+  <tr>
+    <td>
+      <input type=hidden value={{row[0]}}>
+      {{row[1]}}
+    </td>
+    <td>
+      {{row[2]}}
+    </td>
+  </tr>
   {% endfor %}
+  </table>
 </body>
