@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 import secrets
 from clan_details import *
+import database
 
 app = Flask(__name__)
 
@@ -20,6 +21,12 @@ def index():
 
 if __name__=="__main__":
     if len(sys.argv) > 1:
-        pass
+        if sys.argv[1] == "-reset":
+            if sys.argv[2] == "-all":
+                database.InitializeAll()
+            if sys.argv[2] == "-tanks":
+                database.ResetTanks()
+        else:
+            pass
     else:
         app.run(debug=True)
