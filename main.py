@@ -36,6 +36,8 @@ if __name__=="__main__":
                 database.ResetTanks()
             elif sys.argv[2] == "-members":
                 database.ResetClanMembers()
+        elif sys.argv[1] == "-update":
+            database.GetMemberTankStats(sys.argv[2])
         else:
             pass
     else:

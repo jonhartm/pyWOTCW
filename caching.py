@@ -10,7 +10,7 @@ import json
 from bs4 import BeautifulSoup
 
 class CacheFile():
-    def __init__(self, filename, print_info=True):
+    def __init__(self, filename, print_info=False):
         self.filename = filename
         self.API_cache = {}
         self.print_info = print_info
@@ -87,7 +87,7 @@ class CacheFile():
         unique_ID = url # start creating the unique_ID with the URL
         for k in param_keys:
             if not("api" in k and "key" in k): # skip anything with the words "api" and "key"
-                unique_ID += "_" + k + "_" + params[k].lower()
+                unique_ID += "_" + k + "_" + str(params[k]).lower()
         if keys is not None:
             unique_ID += '_' + '_'.join(keys)
 
