@@ -29,7 +29,8 @@ def GetStats():
         	SUM(damage_dealt)/SUM(battles) as AvgDmg,
         	ROUND(SUM(spotting)*1.0/SUM(battles),1) as AvgSpot,
             Members.attendance,
-	        Members.following_calls
+	        Members.following_calls,
+            Members.account_id
         FROM MemberStats
         	JOIN Tanks on Tanks.tank_id = MemberStats.tank_id
         	JOIN Members on Members.account_id = MemberStats.account_id
@@ -45,6 +46,7 @@ def GetStats():
             stats[row[0]][row[1]] = GetTankStats(row)
             stats[row[0]]["Attendance"] = row[5]
             stats[row[0]]["Following_Calls"] = row[6]
+            stats[row[0]]["account_id"] = row[7]
     return stats
 
 def GetTankStats(row):
@@ -76,6 +78,13 @@ def index():
         "index.html",
         members=GetStats()
         )
+
+@app.route('/player/<account_id>', methods=['GET', 'POST'])
+def player(account_id):
+    return render_template(
+        "player.html"
+        )
+
 
 if __name__=="__main__":
     if len(sys.argv) > 1:

@@ -16,7 +16,7 @@
   <th>Following Calls</th>
   {% for member, stats in members.items() %}
   <tr>
-    <td>{{member}}</td>
+    <td><a href="/player/{{stats.account_id}}">{{member}}</a></td>
 
     {% if stats.heavyTank %}
     <td class="rank-{{stats.heavyTank.AvgDmgRank}}">{{stats.heavyTank.AvgDmg}}</td>
