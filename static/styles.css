@@ -1,0 +1,43 @@
+.ratings-table {
+  border: 1px solid #000;
+  border-collapse: collapse;
+  margin: 2% auto;
+  width: 70%;
+}
+.ratings-table th {
+  background-color: #eee;
+  border: 1px solid #000;
+}
+.ratings-table tr {
+  margin: 1px;
+}
+.ratings-table tr:hover {
+  background-color: #eee;
+}
+.ratings-table td {
+  border: 1px solid #000;
+}
+.ratings-table td:not(:first-child) {
+  text-align: center;
+  width: 150px;
+}
+.ratings-table td.rank-1 {
+  background-color: #f00;
+}
+.ratings-table td.rank-2 {
+  background-color: #c6c600;
+}
+.ratings-table td.rank-3 {
+  background-color: #2b5c17;
+}
+.ratings-table td.rank-4 {
+  background-color: #2f679a;
+}
+.ratings-table td.rank-5 {
+  background-color: #503d82;
+}
+.ratings-table td.no-rank {
+  color: #eee;
+}
+
+/*# sourceMappingURL=styles.css.map */

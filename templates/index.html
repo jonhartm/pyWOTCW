@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <title>I've changed things</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <table>
+  <table class="ratings-table">
   <th>Player</th>
   <th>Heavy Dmg</th>
   <th>Medium Dmg</th>
@@ -16,33 +17,33 @@
     <td>{{member}}</td>
 
     {% if stats.heavyTank %}
-    <td>{{stats.heavyTank[1]}}</td>
+    <td class="rank-{{stats.heavyTank.AvgDmgRank}}">{{stats.heavyTank.AvgDmg}}</td>
     {% else %}
-    <td>None</td>
+    <td class="no-rank">None</td>
     {% endif %}
 
     {% if stats.mediumTank %}
-    <td>{{stats.mediumTank[1]}}</td>
+    <td class="rank-{{stats.mediumTank.AvgDmgRank}}">{{stats.mediumTank.AvgDmg}}</td>
     {% else %}
-    <td>None</td>
+    <td class="no-rank">None</td>
     {% endif %}
 
     {% if stats.lightTank %}
-    <td>{{stats.lightTank[2]}}</td>
+    <td class="rank-{{stats.lightTank.SpotsRank}}">{{stats.lightTank.Spots}}</td>
     {% else %}
-    <td>None</td>
+    <td class="no-rank">None</td>
     {% endif %}
 
     {% if stats.SPG %}
-    <td>{{stats.SPG[1]}}</td>
+    <td class="rank-{{stats.SPG.AvgDmgRank}}">{{stats.SPG.AvgDmg}}</td>
     {% else %}
-    <td>None</td>
+    <td class="no-rank">None</td>
     {% endif %}
 
     {% if stats.TD %}
-    <td>{{stats.TD[1]}}</td>
+    <td class="rank-{{stats.TD.AvgDmgRank}}">{{stats.TD.AvgDmg}}</td>
     {% else %}
-    <td>None</td>
+    <td class="no-rank">None</td>
     {% endif %}
   </tr>
   {% endfor %}

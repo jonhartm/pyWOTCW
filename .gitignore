@@ -3,3 +3,4 @@ virtual/
 *.json
 .env
 *.db
+*.yml

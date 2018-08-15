@@ -1,0 +1,1 @@
+{"version":3,"sourceRoot":"","sources":["../sass/styles.scss","../sass/modules/_colors.scss"],"names":[],"mappings":"AAEA;EACE;EACA;EACA;EACA;;AAEA;EACE,kBCRS;EDST;;AAGF;EACE;;AAEA;EACE,kBChBO;;ADoBX;EACE;;AAEA;EACE;EACA;;AAGF;EACE,kBCnBU;;ADsBZ;EACE,kBCtBU;;ADyBZ;EACE,kBCzBU;;AD4BZ;EACE,kBC5BU;;AD+BZ;EACE,kBC/BU;;ADkCZ;EACE,OCjDO","file":"styles.css"}

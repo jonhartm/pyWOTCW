@@ -1,0 +1,54 @@
+@import 'modules/colors';
+
+.ratings-table {
+  border: 1px solid $black;
+  border-collapse: collapse;
+  margin: 2% auto;
+  width: 70%;
+
+  th {
+    background-color: $light-grey;
+    border: 1px solid $black;
+  }
+
+  tr {
+    margin: 1px;
+
+    &:hover {
+      background-color: $light-grey;
+    }
+  }
+
+  td {
+    border: 1px solid $black;
+
+    &:not(:first-child) {
+      text-align: center;
+      width: 150px;
+    }
+
+    &.rank-1 {
+      background-color: $color-scale-1;
+    }
+
+    &.rank-2 {
+      background-color: $color-scale-2;
+    }
+
+    &.rank-3 {
+      background-color: $color-scale-3;
+    }
+
+    &.rank-4 {
+      background-color: $color-scale-4;
+    }
+
+    &.rank-5 {
+      background-color: $color-scale-5;
+    }
+
+    &.no-rank {
+      color: $light-grey;
+    }
+  }
+}
