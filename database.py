@@ -52,6 +52,10 @@ def ResetTanks():
             ])
         statement = 'INSERT INTO Tanks VALUES (?,?,?)'
         cur.executemany(statement, inserts)
+
+        # jinja doesn't like hypens in keys.
+        statement = 'UPDATE Tanks SET type="TD" WHERE type="AT-SPG"'
+        cur.execute(statement)
         conn.commit()
 
 def ResetClanMembers():
