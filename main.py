@@ -27,7 +27,9 @@ def GetStats():
         	Tanks.type,
         	SUM(battles),
         	SUM(damage_dealt)/SUM(battles) as AvgDmg,
-        	ROUND(SUM(spotting)*1.0/SUM(battles),1) as AvgSpot
+        	ROUND(SUM(spotting)*1.0/SUM(battles),1) as AvgSpot,
+            Members.attendance,
+	        Members.following_calls
         FROM MemberStats
         	JOIN Tanks on Tanks.tank_id = MemberStats.tank_id
         	JOIN Members on Members.account_id = MemberStats.account_id
@@ -41,6 +43,8 @@ def GetStats():
             if row[0] not in stats:
                 stats[row[0]] = {}
             stats[row[0]][row[1]] = GetTankStats(row)
+            stats[row[0]]["Attendance"] = row[5]
+            stats[row[0]]["Following_Calls"] = row[6]
     return stats
 
 def GetTankStats(row):

@@ -12,6 +12,8 @@
   <th>Light Spots</th>
   <th>SPG Dmg</th>
   <th>TD Dmg</th>
+  <th>Attendance</th>
+  <th>Following Calls</th>
   {% for member, stats in members.items() %}
   <tr>
     <td>{{member}}</td>
@@ -42,6 +44,18 @@
 
     {% if stats.TD %}
     <td class="rank-{{stats.TD.AvgDmgRank}}">{{stats.TD.AvgDmg}}</td>
+    {% else %}
+    <td class="no-rank">None</td>
+    {% endif %}
+
+    {% if stats.Attendance %}
+    <td class="rank-{{stats.Attendance}}">{{stats.Attendance}}</td>
+    {% else %}
+    <td class="no-rank">None</td>
+    {% endif %}
+
+    {% if stats.Following_Calls %}
+    <td class="rank-{{stats.Following_Calls}}">{{stats.Following_Calls}}</td>
     {% else %}
     <td class="no-rank">None</td>
     {% endif %}

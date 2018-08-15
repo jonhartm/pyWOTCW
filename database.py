@@ -5,7 +5,8 @@
 
 from os import path, getenv
 import sqlite3 as sqlite
-from util import Timer
+import csv
+from util import *
 from caching import *
 
 def GetConnection():
@@ -67,7 +68,9 @@ def ResetClanMembers():
         CREATE TABLE "Members" (
             'account_id' INTEGER NOT NULL PRIMARY KEY,
             'nickname' TEXT,
-            'role' TEXT
+            'role' TEXT,
+            'attendance' INTEGER,
+            'following_calls' INTEGER
         );
         '''
         cur.execute(statement)
@@ -93,14 +96,21 @@ def ResetClanMembers():
         }
         API_data =  ClanDetailsCache.CheckCache_API(url, params, max_age=dt.timedelta(hours=23))["data"][getenv("CLAN_ID")]["members"]
         inserts = []
+        ManualRatings = []
+        with open('Player Viewable CW Ratings.csv', 'r') as file:
+            reader = csv.reader(file)
+            ManualRatings = list(reader)
         for member in API_data:
             GetMemberTankStats(member["account_id"])
+            csv_stats = [[tryParseInt(x) for x in player] for player in ManualRatings if player[0] == member["account_name"]][0]
             inserts.append([
                 member["account_id"],
                 member["account_name"],
-                member["role"]
+                member["role"],
+                csv_stats[1],
+                csv_stats[2]
             ])
-        statement = 'INSERT INTO Members VALUES (?,?,?)'
+        statement = 'INSERT INTO Members VALUES (?,?,?,?,?)'
         cur.executemany(statement, inserts)
         conn.commit()
 
