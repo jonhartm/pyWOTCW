@@ -81,7 +81,12 @@ def ResetClanMembers():
             'tank_id' INTEGER NOT NULL,
             'battles' INTEGER,
             'damage_dealt' INTEGER,
-            'spotting' INTEGER
+            'spotting' INTEGER,
+
+            CONSTRAINT account
+                FOREIGN KEY (account_id)
+                REFERENCES Members(account_id)
+                ON DELETE CASCADE
         );
         '''
         cur.execute(statement)
