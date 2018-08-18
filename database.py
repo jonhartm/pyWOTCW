@@ -6,6 +6,7 @@
 from os import path, getenv
 import sqlite3 as sqlite
 import csv
+from datetime import datetime, timedelta
 from util import *
 from caching import *
 
@@ -61,6 +62,8 @@ def ResetTanks(force_update=False):
         cur.execute(statement)
         conn.commit()
 
+# drops all data about clan members and re-fills from API calls
+# basically a full reset minus the tanks call.
 def ResetClan():
     with GetConnection() as conn:
         cur = conn.cursor()
@@ -91,6 +94,29 @@ def ResetClan():
         '''
         print("Creating Table 'MemberStats'")
         cur.execute(statement)
+
+        DropTable("StatHistory", cur)
+        statement = '''
+        CREATE TABLE StatHistory (
+        	account_id INTEGER,
+        	avgDmg INTEGER,
+        	HTDmg INTEGER,
+        	MTDmg INTEGER,
+        	LTSpots INTEGER,
+        	TDDmg INTEGER,
+        	SPGDmg INTEGER,
+        	updated_at TIME,
+
+        	PRIMARY KEY (account_id, updated_at),
+            CONSTRAINT account
+                FOREIGN KEY (account_id)
+                REFERENCES Members(account_id)
+                ON DELETE CASCADE
+        );
+        '''
+        print("Creating Table 'StatHistory'")
+        cur.execute(statement)
+
     UpdateClanMembers()
 
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
@@ -99,6 +125,11 @@ def ResetClan():
 def UpdateClanMembers():
     with GetConnection() as conn:
         cur = conn.cursor()
+
+        # check to see if the tables even exist before we try filling them
+        cur.execute("SELECT COUNT() FROM sqlite_master WHERE type='table' AND name='Members'")
+        if [x[0] for x in cur][0] is not 1:
+            raise Exception("No Tables found: run command 'main.py -reset' and try again.")
 
         t = Timer()
         t.Start()
@@ -113,7 +144,7 @@ def UpdateClanMembers():
         API_data = Cache.CheckCache_API(
             url,
             params,
-            max_age=dt.timedelta(hours=23)
+            max_age=dt.timedelta(days=6, hours=23)
         )["data"][getenv("CLAN_ID")]["members"]
         print("Clan details found for {} members...".format(len(API_data)))
 
@@ -147,8 +178,8 @@ def UpdateClanMembers():
         t.Stop()
         print("Clan details loaded in {}".format(t))
 
-        # Load the stats for all of the members
-        # GetMemberTankStats(member_ids)
+        # Load the stats for all of the members pulled in with the API
+        UpdateMemberTankStats([x["account_id"] for x in API_data])
 
 def GetTierTenTankIDs():
     with GetConnection() as conn:
@@ -158,7 +189,8 @@ def GetTierTenTankIDs():
         # for row in cur: ids.append(row[0])
         return [str(x[0]) for x in cur]
 
-def GetMemberTankStats(account_ids):
+def UpdateMemberTankStats(account_ids):
+    # load tank stats for every account id passed in
     url = "https://api.worldoftanks.com/wot/tanks/stats/"
     params = {
     "application_id": getenv("WG_APP_ID"),
@@ -192,8 +224,102 @@ def GetMemberTankStats(account_ids):
     t.Start()
     with GetConnection() as conn:
         cur = conn.cursor()
-        query = 'INSERT INTO MemberStats VALUES (?,?,?,?,?)'
-        cur.executemany(query, inserts)
+        # Clear the table
+        cur.execute("DELETE FROM MemberStats")
+
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?)", inserts)
         conn.commit()
     t.Stop()
     print("Statistics added to DB in {}.".format(t))
+    AddStatHistory()
+
+def AddStatHistory():
+    # Aggregate those stats into the Stat History table via a temporary table
+    with GetConnection() as conn:
+        cur = conn.cursor()
+
+        # check if we qualify based on the most recent stat history and the interval from the .env file
+        statment = '''
+        SELECT updated_at FROM StatHistory
+        GROUP BY updated_at
+        ORDER BY updated_at DESC
+        LIMIT 1
+        '''
+        cur.execute(statment)
+        most_recent_update = datetime.strptime([x[0] for x in cur][0], "%Y-%m-%d")
+        current_time = datetime.now() + timedelta(hours=1)
+        print("Most Recent Stats: {} ago...".format(current_time - most_recent_update))
+
+        if (current_time - most_recent_update) < timedelta(days=int(getenv("DAYS_BETWEEN_STAT_HISTORY"))):
+            print("Last stats update was less than {} days ago.".format(getenv("DAYS_BETWEEN_STAT_HISTORY")))
+            return
+
+        print("Updating Stats...")
+
+        print("Creating avgStats temporary table...")
+        DropTable("avgStats", cur)
+        statement = '''
+        CREATE TABLE avgStats (
+        	account_id INTEGER,
+        	type TEXT,
+        	avgDmg INTEGER,
+        	avgSpot INTEGER
+        );
+        '''
+        cur.execute(statement)
+
+        print("Loading avgStats table...")
+        statement = '''
+        INSERT INTO avgStats
+        	SELECT
+        		account_id,
+        		type,
+        		SUM(damage_dealt)/SUM(battles) AS avgDmg,
+        		ROUND(SUM(spotting)*1.0/SUM(battles),1) AS avgSpot
+        	FROM MemberStats
+        		JOIN Tanks ON Tanks.tank_id = MemberStats.tank_id
+        	GROUP BY account_id, type;
+            '''
+        cur.execute(statement)
+
+        print("Coallating stats into StatHistory...")
+        statement = '''
+        INSERT INTO StatHistory
+        	SELECT
+        		Members.account_id,
+        		Overall.avgDmg,
+        		HTstats.avgDmg AS Htdmg,
+        		MTstats.avgDmg AS MTdmg,
+        		LTstats.avgSpot AS LTSpots,
+        		TDstats.avgDmg AS TDdmg,
+        		SPGstats.avgdmg AS SPGdmg,
+        		Date() AS updated_at
+        	FROM Members
+        		LEFT JOIN (
+        			SELECT
+        				account_id,
+        				SUM(damage_dealt)/SUM(battles) AS avgDmg
+        			FROM MemberStats
+        			GROUP BY account_id
+        		) AS Overall ON Members.account_id = Overall.account_id
+        		LEFT OUTER JOIN avgStats as HTstats ON
+        			Members.account_id = HTstats.account_id
+        			and HTstats.type = "heavyTank"
+        		LEFT OUTER JOIN avgStats as MTstats ON
+        			Members.account_id = MTstats.account_id
+        			and MTstats.type = "mediumTank"
+        		LEFT OUTER JOIN avgStats as LTstats ON
+        			Members.account_id = LTstats.account_id
+        			and LTstats.type = "lightTank"
+        		LEFT OUTER JOIN avgStats as TDstats ON
+        			Members.account_id = TDstats.account_id
+        			and TDstats.type = "TD"
+        		LEFT OUTER JOIN avgStats as SPGstats ON
+        			Members.account_id = SPGstats.account_id
+        			and SPGstats.type = "SPG"
+        '''
+        cur.execute(statement)
+        print("Added StatHistory row for {} players".format(cur.rowcount))
+
+        print("Dropping avgStats temporary table...")
+        DropTable("avgStats", cur)
