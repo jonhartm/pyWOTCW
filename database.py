@@ -144,7 +144,7 @@ def UpdateClanMembers():
         API_data = Cache.CheckCache_API(
             url,
             params,
-            max_age=dt.timedelta(days=6, hours=23)
+            max_age=dt.timedelta(hours=23)
         )["data"][getenv("CLAN_ID")]["members"]
         print("Clan details found for {} members...".format(len(API_data)))
 
