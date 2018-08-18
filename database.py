@@ -246,13 +246,16 @@ def AddStatHistory():
         LIMIT 1
         '''
         cur.execute(statment)
-        most_recent_update = datetime.strptime([x[0] for x in cur][0], "%Y-%m-%d")
-        current_time = datetime.now() + timedelta(hours=1)
-        print("Most Recent Stats: {} ago...".format(current_time - most_recent_update))
+        try:
+            most_recent_update = datetime.strptime([x[0] for x in cur][0], "%Y-%m-%d")
+            current_time = datetime.now() + timedelta(hours=1)
+            print("Most Recent Stats: {} ago...".format(current_time - most_recent_update))
 
-        if (current_time - most_recent_update) < timedelta(days=int(getenv("DAYS_BETWEEN_STAT_HISTORY"))):
-            print("Last stats update was less than {} days ago.".format(getenv("DAYS_BETWEEN_STAT_HISTORY")))
-            return
+            if (current_time - most_recent_update) < timedelta(days=int(getenv("DAYS_BETWEEN_STAT_HISTORY"))):
+                print("Last stats update was less than {} days ago.".format(getenv("DAYS_BETWEEN_STAT_HISTORY")))
+                return
+        except Exception as e:
+            print("Unable to locate a stat history update...")
 
         print("Updating Stats...")
 
