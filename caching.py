@@ -98,9 +98,9 @@ class CacheFile():
             elif max_age is not None:
                 age = time.time() - self.API_cache[unique_ID]["accessed"]
                 if  dt.timedelta(seconds=age) > max_age:
-                    if self.print_info: print("Request is more than {} old. Refreshing data.".format(max_age))
+                    if self.print_info: print("Request is more than {} old. Refreshing data....".format(max_age))
                 else:
-                    if self.print_info: print("Request is less than {} old.".format(max_age))
+                    if self.print_info: print("Request is less than {} old. Loading from cache....".format(max_age))
                     return self.API_cache[unique_ID]["data"]
             else:
                 if self.print_info: print("Repeated request - retrieving from cache file.")
