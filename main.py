@@ -23,49 +23,69 @@ def GetStats():
         cur = conn.cursor()
         query = '''
         SELECT
-        	nickname,
-        	Tanks.type,
-        	ROUND((SELECT SUM(damage_dealt)/SUM(battles) FROM MemberStats WHERE account_id = Members.account_id AND battles > 0)) AS OverallAvgDmg,
-        	SUM(damage_dealt)/SUM(battles) as AvgDmg,
-        	ROUND(SUM(spotting)*1.0/SUM(battles),1) as AvgSpot,
-            Members.attendance,
-	        Members.following_calls,
-            Members.account_id
-        FROM MemberStats
-        	JOIN Tanks on Tanks.tank_id = MemberStats.tank_id
-        	JOIN Members on Members.account_id = MemberStats.account_id
-        GROUP BY Tanks.type, nickname
-        HAVING battles > 0
+        	Members.account_id,
+        	Members.nickname,
+        	avgDmg,
+        	HTDmg,
+        	MTDmg,
+        	LTSpots,
+        	TDDmg,
+        	SPGDmg
+        FROM StatHistory
+        	JOIN Members ON StatHistory.account_id = Members.account_id
+        WHERE updated_at = (
+        	SELECT updated_at
+        	FROM StatHistory
+        	GROUP BY updated_at
+        	ORDER By updated_at DESC
+        	LIMIT 1
+        )
         ORDER BY nickname
         '''
-        cur.execute(query)
-        for row in cur:
-            # make sure there's a key for this player
-            if row[0] not in stats:
-                stats[row[0]] = {}
-            stats[row[0]]["OverallAvgDmg"] = row[2]
-            stats[row[0]]["OverallAvgDmgRank"] = GetRank(row[2], DMG_BREAKS)
-            stats[row[0]][row[1]] = GetTankStats(row)
-            stats[row[0]]["Attendance"] = row[5]
-            stats[row[0]]["Following_Calls"] = row[6]
-            stats[row[0]]["account_id"] = row[7]
-    return stats
+        for p in [x for x in cur.execute(query)]:
+            player = {
+                "nickname":p[1]
+            }
 
-def GetTankStats(row):
-    ret_dict = {
-        "AvgDmg": row[3],
-        "AvgDmgRank": GetRank(row[3], DMG_BREAKS),
-        "Spots": row[4],
-        "SpotsRank": GetRank(row[4], SPOT_BREAKS)
-    }
-    return ret_dict
+            if p[2] is not None:
+                player['overall'] = {
+                    "dmg":p[2],
+                    "rank":GetRank(p[2], DMG_BREAKS)
+                }
+
+            if p[3] is not None:
+                player['HT'] = {
+                    "dmg":p[3],
+                    "rank":GetRank(p[3], DMG_BREAKS)
+                }
+            if p[4] is not None:
+                player['MT'] = {
+                    "dmg":p[4],
+                    "rank":GetRank(p[4], DMG_BREAKS)
+                }
+            if p[5] is not None:
+                player['LT'] = {
+                    "dmg":p[5],
+                    "rank":GetRank(p[5], SPOT_BREAKS)
+                }
+            if p[6] is not None:
+                player['TD'] = {
+                    "dmg":p[6],
+                    "rank":GetRank(p[6], DMG_BREAKS)
+                }
+            if p[7] is not None:
+                player['SPG'] = {
+                    "dmg":p[7],
+                    "rank":GetRank(p[7], DMG_BREAKS)
+                }
+            stats[p[0]] = player
+    return stats
 
 def GetRank(value, breaks):
     for rank in range(len(breaks)):
         if value < breaks[rank]:
             return rank + 1
     return 5
-
 
 @app.route('/')
 def index():
@@ -78,7 +98,7 @@ def index():
 
     return render_template(
         "index.html",
-        members=GetStats()
+        players=GetStats()
         )
 
 @app.route('/player/<account_id>', methods=['GET', 'POST'])
