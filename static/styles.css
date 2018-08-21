@@ -1,3 +1,12 @@
+@keyframes btnpress {
+  from {
+    box-shadow: 2px 2px 2px #ccc;
+  }
+  to {
+    box-shadow: none;
+    transform: translate(2px, 2px);
+  }
+}
 .ratings-table {
   border: 1px solid #000;
   border-collapse: collapse;
@@ -38,6 +47,32 @@
 }
 .ratings-table td.no-rank {
   color: #eee;
+}
+
+.controls {
+  margin: auto;
+  width: 20%;
+}
+.controls input {
+  background-color: #fff;
+  border: 1px solid #000;
+  border-radius: 10px;
+  box-shadow: 2px 2px 2px #ccc;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  margin: 3px 2px;
+  padding: 5px 20px;
+  text-align: center;
+  text-decoration: none;
+}
+.controls input:not(.active):hover {
+  background-color: #aef;
+}
+.controls .active {
+  animation: btnpress 0.1s ease-in;
+  animation-fill-mode: forwards;
+  background-color: #eee;
 }
 
 /*# sourceMappingURL=styles.css.map */

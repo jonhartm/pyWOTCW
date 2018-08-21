@@ -5,6 +5,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+  <div class="controls">
+    <input type="button" class="chng-view active" value="View Ranks"></button>
+    <input type="button" class="chng-view" value="View Values"></button>
+  </div>
   <table class="ratings-table">
   <th>Player</th>
   <th>Overall Avg Dmg</th>
@@ -21,7 +25,7 @@
 
     {% if player.overall %}
     <td class="rank-{{player.overall.rank}}">
-      {{player.overall.rank}}
+      <span>{{player.overall.rank}}</span>
       <input type=hidden value={{player.overall.dmg}}>
     </td>
     {% else %}
@@ -30,7 +34,7 @@
 
     {% if player.HT %}
     <td class="rank-{{player.HT.rank}}">
-      {{player.HT.rank}}
+      <span>{{player.HT.rank}}</span>
       <input type=hidden value={{player.HT.dmg}}>
     </td>
     {% else %}
@@ -39,7 +43,7 @@
 
     {% if player.MT %}
     <td class="rank-{{player.MT.rank}}">
-      {{player.MT.rank}}
+      <span>{{player.MT.rank}}</span>
       <input type=hidden value={{player.MT.dmg}}>
     </td>
     {% else %}
@@ -48,7 +52,7 @@
 
     {% if player.LT %}
     <td class="rank-{{player.LT.rank}}">
-      {{player.HT.rank}}
+      <span>{{player.HT.rank}}</span>
       <input type=hidden value={{player.LT.dmg}}>
     </td>
     {% else %}
@@ -57,7 +61,7 @@
 
     {% if player.TD %}
     <td class="rank-{{player.TD.rank}}">
-      {{player.TD.rank}}
+      <span>{{player.TD.rank}}</span>
       <input type=hidden value={{player.TD.dmg}}>
     </td>
     {% else %}
@@ -66,7 +70,7 @@
 
     {% if player.SPG %}
     <td class="rank-{{player.SPG.rank}}">
-      {{player.SPG.rank}}
+      <span>{{player.SPG.rank}}</span>
       <input type=hidden value={{player.SPG.dmg}}>
     </td>
     {% else %}

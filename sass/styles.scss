@@ -1,5 +1,7 @@
 @import 'modules/colors';
 
+@import 'partials/btnpress';
+
 .ratings-table {
   border: 1px solid $black;
   border-collapse: collapse;
@@ -50,5 +52,34 @@
     &.no-rank {
       color: $light-grey;
     }
+  }
+}
+
+.controls {
+  margin: auto;
+  width: 20%;
+
+  input {
+    background-color: $white;
+    border: 1px solid $black;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px $dark-grey;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 3px 2px;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+
+    &:not(.active):hover {
+      background-color: $light-blue;
+    }
+  }
+
+  .active {
+    animation: btnpress .1s ease-in;
+    animation-fill-mode: forwards;
+    background-color: $light-grey;
   }
 }

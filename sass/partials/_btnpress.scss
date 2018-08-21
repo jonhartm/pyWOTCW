@@ -1,0 +1,11 @@
+// Animate a button so it appears to have been pushed 
+@keyframes btnpress {
+  from {
+    box-shadow: 2px 2px 2px $dark-grey;
+  }
+
+  to {
+    box-shadow: none;
+    transform: translate(2px, 2px);
+  }
+}
