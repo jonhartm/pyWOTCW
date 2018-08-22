@@ -190,7 +190,7 @@ def player(account_id):
     with database.GetConnection() as conn:
         cur = conn.cursor()
         cur.execute("SELECT nickname FROM Members WHERE account_id = ?", [account_id])
-        nickname = cur.fetchall()[0]
+        nickname = cur.fetchone()[0]
     stats = GetIndivStats(account_id)
     return render_template(
         "player.html",
