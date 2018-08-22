@@ -1,1 +1,69 @@
-hi there
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Statistics For {{name}}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  {% for type, stats in tank_stats.items() %}
+
+    {% if type == "heavyTank" %}
+      <h1>Heavy Tanks</h1>
+    {% elif type == "mediumTank" %}
+      <h1>Medium Tanks</h1>
+    {% elif type == "lightTank" %}
+      <h1>Light Tanks</h1>
+    {% elif type == "SPG" %}
+      <h1>Self Propelled Guns</h1>
+    {% elif type == "TD" %}
+      <h1>Tank Destroyers</h1>
+    {% else %}
+      <h1>UNKNOWN TANK TYPE: {{type}}
+    {% endif %}
+
+    {% if stats|length == 0 %}
+      <h2>No CW battles fought in this tank class...</h2>
+    {% else %}
+      <table class="ratings-table">
+        <th>Tank</th>
+        <th>CW Battles</th>
+        <th>Average Damage</th>
+        {% for stat in stats %}
+        <tr>
+          <td>{{stat['name']}}</td>
+          <td>{{stat['battles']}}</td>
+          <td class="rank-{{stat['dmgRank']}}">{{stat['avgDmg']}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+  {% endif %}
+  {% endfor %}
+  <h1>Clan Wars Stats Over Time</h1>
+  <table class="ratings-table">
+    <th>Overall</th>
+    <th>Heavy Tanks</th>
+    <th>Medium Tanks</th>
+    <th>Light Tanks</th>
+    <th>Self Propelled Guns</th>
+    <th>Tank Destroyers</th>
+    <th>Date</th>
+    {% for stat in stat_hist %}
+    <tr>
+      <td class="rank-{{stat['overall'].rank}}">{{stat['overall'].dmg}}</td>
+      <td class="rank-{{stat['HT'].rank}}">{{stat['HT'].dmg}}</td>
+      <td class="rank-{{stat['MT'].rank}}">{{stat['MT'].dmg}}</td>
+      <td class="rank-{{stat['LT'].rank}}">{{stat['LT'].spots}}</td>
+      <td class="rank-{{stat['SPG'].rank}}">{{stat['SPG'].dmg}}</td>
+      <td class="rank-{{stat['TD'].rank}}">{{stat['TD'].dmg}}</td>
+      <td>{{stat['updated']}}</td>
+    </tr>
+    {% endfor %}
+  <table>
+</body>
+<footer>
+  <script
+	  src="https://code.jquery.com/jquery-3.3.1.min.js"
+	  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	  crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</footer>
