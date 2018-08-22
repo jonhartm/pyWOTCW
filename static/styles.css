@@ -30,6 +30,10 @@
   text-align: center;
   width: 150px;
 }
+.ratings-table td.same-first-col {
+  text-align: center;
+  width: 150px;
+}
 .ratings-table td.rank-1 {
   background-color: #f00;
 }
@@ -73,6 +77,31 @@
   animation: btnpress 0.1s ease-in;
   animation-fill-mode: forwards;
   background-color: #eee;
+}
+
+.title-text {
+  text-align: center;
+  text-decoration: underline;
+}
+
+.table-title {
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  margin: 0 auto;
+  margin-top: 40px;
+  text-align: center;
+  width: 50%;
+}
+.table-title h1 {
+  font-size: 20px;
+}
+
+.info-text {
+  text-align: center;
+}
+.info-text p {
+  font-size: 14px;
 }
 
 /*# sourceMappingURL=styles.css.map */

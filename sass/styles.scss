@@ -29,6 +29,12 @@
       width: 150px;
     }
 
+    // TODO: I'm tired. Figure out this + previous rule. This works for now.
+    &.same-first-col {
+      text-align: center;
+      width: 150px;
+    }
+
     &.rank-1 {
       background-color: $color-scale-1;
     }
@@ -81,5 +87,33 @@
     animation: btnpress .1s ease-in;
     animation-fill-mode: forwards;
     background-color: $light-grey;
+  }
+}
+
+// Text
+.title-text {
+  text-align: center;
+  text-decoration: underline;
+}
+
+.table-title {
+  background-color: $light-grey;
+  border-bottom: 1px solid $dark-grey;
+  border-top: 1px solid $dark-grey;
+  margin: 0 auto;
+  margin-top: 40px;
+  text-align: center;
+  width: 50%;
+
+  h1 {
+    font-size: 20px;
+  }
+}
+
+.info-text {
+  text-align: center;
+
+  p {
+    font-size: 14px;
   }
 }
