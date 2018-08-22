@@ -56,12 +56,20 @@
       <table class="ratings-table">
         <th>Tank</th>
         <th>CW Battles</th>
-        <th>Average Damage</th>
+        {% if type == "lightTank" %}
+          <th>Average Spotting</th>
+        {% else %}
+          <th>Average Damage</th>
+        {% endif %}
         {% for stat in stats %}
         <tr>
           <td>{{stat['name']}}</td>
           <td>{{stat['battles']}}</td>
-          <td class="rank-{{stat['dmgRank']}}">{{stat['avgDmg']}}</td>
+          {% if type == "lightTank" %}
+            <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
+          {% else %}
+            <td class="rank-{{stat['dmgRank']}}">{{stat['avgDmg']}}</td>
+          {% endif %}
         </tr>
         {% endfor %}
     </table>
