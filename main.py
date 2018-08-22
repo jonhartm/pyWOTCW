@@ -11,8 +11,6 @@ app = Flask(__name__)
 
 load_dotenv()
 
-ROOT = path.dirname(path.realpath(__file__))
-
 DMG_BREAKS = [1200, 1350, 1400, 1500]
 SPOT_BREAKS = [2,4,6,8]
 ATTENDANCE_BREAKS = [.2,.4,.6,.8]
@@ -27,7 +25,7 @@ ATTENDANCE_BREAKS = [.2,.4,.6,.8]
 
 def GetStats():
     stats = {}
-    with sqlite.connect(path.join(ROOT, "wotcw.db")) as conn:
+    with database.GetConnection() as conn:
         cur = conn.cursor()
         query = '''
         SELECT
