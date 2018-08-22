@@ -17,13 +17,13 @@ DMG_BREAKS = [1200, 1350, 1400, 1500]
 SPOT_BREAKS = [2,4,6,8]
 ATTENDANCE_BREAKS = [.2,.4,.6,.8]
 
-if not path.isfile(".env"):
-    raise Exception("Missing .env file...")
-else:
-    if getenv("WG_APP_ID") is None:
-        raise Exception("Missing .env Setting: 'WG_APP_ID'")
-    if getenv("CLAN_ID") is None:
-        raise Exception("Missing .env Setting: 'CLAN_ID'")
+# if not path.isfile(".env"):
+#     raise Exception("Missing .env file...")
+# else:
+#     if getenv("WG_APP_ID") is None:
+#         raise Exception("Missing .env Setting: 'WG_APP_ID'")
+#     if getenv("CLAN_ID") is None:
+#         raise Exception("Missing .env Setting: 'CLAN_ID'")
 
 def GetStats():
     stats = {}
