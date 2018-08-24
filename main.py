@@ -46,7 +46,7 @@ def GetStats():
         	ORDER By updated_at DESC
         	LIMIT 1
         )
-        ORDER BY nickname
+        ORDER BY nickname COLLATE NOCASE
         '''
         for p in [x for x in cur.execute(query)]:
             player = {
