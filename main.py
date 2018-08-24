@@ -71,7 +71,7 @@ def GetStats():
                 }
             if p[5] is not None:
                 player['LT'] = {
-                    "dmg":p[5],
+                    "spot":p[5],
                     "rank":GetRank(p[5], SPOT_BREAKS)
                 }
             if p[6] is not None:
