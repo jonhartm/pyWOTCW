@@ -288,8 +288,8 @@ def AddStatHistory():
         		type,
         		SUM(damage_dealt)/SUM(battles) AS avgDmg,
         		ROUND(SUM(spotting)*1.0/SUM(battles),1) AS avgSpot
-        	FROM MemberStats
-        		JOIN Tanks ON Tanks.tank_id = MemberStats.tank_id
+        	FROM (SELECT * FROM MemberStats WHERE battles > 5) AS Stats
+        		JOIN Tanks ON Tanks.tank_id = Stats.tank_id
         	GROUP BY account_id, type;
             '''
         cur.execute(statement)
