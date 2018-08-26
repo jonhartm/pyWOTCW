@@ -8,7 +8,7 @@ if not os.path.isfile("settings.json"):
             "DMG_BREAKS":[1200, 1350, 1400, 1500],
             "SPOT_BREAKS":[2,4,6,8],
             "ATTENDANCE_BREAKS":[.2,.4,.6,.8],
-            "HIT_PERCENT_BREAKS":[65,74,78,83]
+            "HIT_PERCENT_BREAKS":[72.6,75.8,77.7,81]
         }, settingsFile)
 
 with open("settings.json", 'r') as settingsFile:
