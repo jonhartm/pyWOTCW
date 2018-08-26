@@ -87,6 +87,7 @@ def ResetClan():
             'battles' INTEGER,
             'damage_dealt' INTEGER,
             'spotting' INTEGER,
+            'hit_percent' INTEGER,
 
             CONSTRAINT account
                 FOREIGN KEY (account_id)
@@ -203,7 +204,7 @@ def UpdateMemberTankStats(account_ids):
     url = "https://api.worldoftanks.com/wot/tanks/stats/"
     params = {
     "application_id": getenv("WG_APP_ID"),
-    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted",
+    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.hits_percents",
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -225,7 +226,8 @@ def UpdateMemberTankStats(account_ids):
                     stat["tank_id"],
                     stat["globalmap"]["battles"],
                     stat["globalmap"]["damage_dealt"],
-                    stat["globalmap"]["spotted"]
+                    stat["globalmap"]["spotted"],
+                    stat["globalmap"]["hits_percents"]
                 ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
@@ -236,7 +238,7 @@ def UpdateMemberTankStats(account_ids):
         # Clear the table
         cur.execute("DELETE FROM MemberStats")
 
-        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?)", inserts)
         conn.commit()
     t.Stop()
     print("Statistics added to DB in {}.".format(t))
