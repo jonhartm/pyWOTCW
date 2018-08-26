@@ -63,7 +63,12 @@
         {% endif %}
         {% for stat in stats %}
         <tr>
-          <td>{{stat['name']}}</td>
+          <td>
+            {{stat['name']}}
+            {% if stat['battles'] < 5 %}
+            *
+            {% endif %}
+          </td>
           <td>{{stat['battles']}}</td>
           {% if type == "lightTank" %}
             <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
@@ -75,6 +80,9 @@
     </table>
   {% endif %}
   {% endfor %}
+  <div class="info-text">
+    <p>(* Tanks with < 5 battles are not included in overall statistics)</p>
+  </div>
 </body>
 <footer>
   <script
