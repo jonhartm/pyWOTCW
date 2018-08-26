@@ -34,6 +34,7 @@ def ResetTanks(force_update=False):
         statement = '''
         CREATE TABLE "Tanks" (
             'tank_id' INTEGER NOT NULL PRIMARY KEY,
+            'tier' INTEGER,
             'type' TEXT,
             'name' TEXT
         );
@@ -43,18 +44,19 @@ def ResetTanks(force_update=False):
         url = "https://api.worldoftanks.com/wot/encyclopedia/vehicles/"
         params = {
             "application_id": getenv("WG_APP_ID"),
-            "fields": "type, name",
-            "tier": "10"
+            "fields": "tier, type, name",
+            "tier": "6,8,9,10"
         }
         API_data =  Cache.CheckCache_API(url, params, force_update=force_update)["data"]
         inserts = []
         for tank in API_data:
             inserts.append([
                 tank,
+                API_data[tank]["tier"],
                 API_data[tank]["type"],
                 API_data[tank]["name"]
             ])
-        statement = 'INSERT INTO Tanks VALUES (?,?,?)'
+        statement = 'INSERT INTO Tanks VALUES (?,?,?,?)'
         cur.executemany(statement, inserts)
 
         # jinja doesn't like hypens in keys.
