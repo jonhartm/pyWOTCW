@@ -36,7 +36,10 @@ def GetStats():
         	MTDmg,
         	LTSpots,
         	TDDmg,
-        	SPGDmg
+        	SPGDmg,
+            HTHitPer,
+            MTHitPer,
+            TDHitPer
         FROM StatHistory
         	JOIN Members ON StatHistory.account_id = Members.account_id
         WHERE updated_at = (
@@ -62,12 +65,16 @@ def GetStats():
             if p[3] is not None:
                 player['HT'] = {
                     "dmg":p[3],
-                    "rank":GetRank(p[3], settings.DMG_BREAKS)
+                    "rank":GetRank(p[3], settings.DMG_BREAKS),
+                    "hitPer":p[8],
+                    "hitPerRank":GetRank(p[8], settings.HIT_PERCENT_BREAKS)
                 }
             if p[4] is not None:
                 player['MT'] = {
                     "dmg":p[4],
-                    "rank":GetRank(p[4], settings.DMG_BREAKS)
+                    "rank":GetRank(p[4], settings.DMG_BREAKS),
+                    "hitPer":p[9],
+                    "hitPerRank":GetRank(p[9], settings.HIT_PERCENT_BREAKS)
                 }
             if p[5] is not None:
                 player['LT'] = {
@@ -77,7 +84,9 @@ def GetStats():
             if p[6] is not None:
                 player['TD'] = {
                     "dmg":p[6],
-                    "rank":GetRank(p[6], settings.DMG_BREAKS)
+                    "rank":GetRank(p[6], settings.DMG_BREAKS),
+                    "hitPer":p[10],
+                    "hitPerRank":GetRank(p[10], settings.HIT_PERCENT_BREAKS)
                 }
             if p[7] is not None:
                 player['SPG'] = {

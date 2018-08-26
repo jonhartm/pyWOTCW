@@ -13,9 +13,12 @@
   <th>Player</th>
   <th>Overall Avg Dmg</th>
   <th>Heavy Dmg</th>
+  <th>Heavy Hit%</th>
   <th>Medium Dmg</th>
+  <th>Medium Hit%</th>
   <th>Light Spots</th>
   <th>TD Dmg</th>
+  <th>TD Hit%</th>
   <th>SPG Dmg</th>
   <!-- <th>Attendance</th>
   <th>Following Calls</th> -->
@@ -37,7 +40,12 @@
       <span>{{player.HT.rank}}</span>
       <input type=hidden value={{player.HT.dmg}}>
     </td>
+    <td class="rank-{{player.HT.hitPerRank}}">
+      <span>{{player.HT.hitPerRank}}</span>
+      <input type=hidden value={{player.HT.hitPer}}>
+    </td>
     {% else %}
+    <td class="no-rank">None</td>
     <td class="no-rank">None</td>
     {% endif %}
 
@@ -46,7 +54,12 @@
       <span>{{player.MT.rank}}</span>
       <input type=hidden value={{player.MT.dmg}}>
     </td>
+    <td class="rank-{{player.MT.hitPerRank}}">
+      <span>{{player.MT.hitPerRank}}</span>
+      <input type=hidden value={{player.MT.hitPer}}>
+    </td>
     {% else %}
+    <td class="no-rank">None</td>
     <td class="no-rank">None</td>
     {% endif %}
 
@@ -64,7 +77,12 @@
       <span>{{player.TD.rank}}</span>
       <input type=hidden value={{player.TD.dmg}}>
     </td>
+    <td class="rank-{{player.TD.hitPerRank}}">
+      <span>{{player.TD.hitPerRank}}</span>
+      <input type=hidden value={{player.TD.hitPer}}>
+    </td>
     {% else %}
+    <td class="no-rank">None</td>
     <td class="no-rank">None</td>
     {% endif %}
 
