@@ -183,12 +183,19 @@ def UpdateClanMembers():
         # Load the stats for all of the members pulled in with the API
         UpdateMemberTankStats([x["account_id"] for x in API_data])
 
-def GetTierTenTankIDs():
+# params: tier - integer between 1 and 10
+#         ids - (optional) a list of integers to include in addition to the tier selected
+# returns: a list of strings coorresponding to tank ids that meet the parameters
+def GetTankIDs(tier, ids=None):
     with GetConnection() as conn:
         cur = conn.cursor()
-        query = "SELECT tank_id FROM Tanks"
-        cur.execute(query)
-        # for row in cur: ids.append(row[0])
+        if ids is None:
+            query = "SELECT tank_id FROM Tanks WHERE tier = ?"
+            cur.execute(query, [tier])
+        else:
+            id_list = ','.join([str(x) for x in ids])
+            query = "SELECT tank_id FROM Tanks WHERE tier = ? OR tank_id IN (?)"
+            cur.execute(query, [tier, id_list])
         return [str(x[0]) for x in cur]
 
 def UpdateMemberTankStats(account_ids):
@@ -198,7 +205,7 @@ def UpdateMemberTankStats(account_ids):
     "application_id": getenv("WG_APP_ID"),
     "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted",
     "in_garage": "1",
-    "tank_id": ','.join(GetTierTenTankIDs())
+    "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
     inserts = []
     for id in account_ids:

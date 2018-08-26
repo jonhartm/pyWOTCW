@@ -203,8 +203,13 @@ def player(account_id):
 if __name__=="__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "-reset":
-            if input("This will reset the entire database - are you sure? (y/n): ").lower() == "y":
-                database.InitializeAll()
+            if len(sys.argv) > 2:
+                if sys.argv[2] == "-tanks":
+                    database.ResetTanks(True)
+            else:
+                if input("This will reset the entire database - are you sure? (y/n): ").lower() == "y":
+                    database.InitializeAll()
+
         elif sys.argv[1] == "-update":
             print("Updating database...")
             database.UpdateClanMembers()
@@ -213,5 +218,7 @@ if __name__=="__main__":
                 print(GetIndivStats(sys.argv[2]))
             else:
                 print(GetStats())
+        else:
+            pass # test functions here
     else:
         app.run(debug=True)
