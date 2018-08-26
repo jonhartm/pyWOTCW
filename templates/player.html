@@ -60,6 +60,7 @@
           <th>Average Spotting</th>
         {% else %}
           <th>Average Damage</th>
+          <th>Hit Percentage</th>
         {% endif %}
         {% for stat in stats %}
         <tr>
@@ -74,6 +75,7 @@
             <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
           {% else %}
             <td class="rank-{{stat['dmgRank']}}">{{stat['avgDmg']}}</td>
+            <td class="rank-{{stat['hitPercentRank']}}">{{stat['hitPercent']}}</td>
           {% endif %}
         </tr>
         {% endfor %}

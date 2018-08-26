@@ -113,7 +113,8 @@ def GetIndivStats(account_id):
         	Tanks.type,
         	battles,
         	ROUND(damage_dealt*1.0/battles, 2) AS avgDmg,
-        	ROUND(spotting*1.0/battles, 2) AS avgSpotting
+        	ROUND(spotting*1.0/battles, 2) AS avgSpotting,
+            hit_percent
         FROM MemberStats
         	JOIN Tanks ON MemberStats.tank_id = Tanks.tank_id
         WHERE account_id = ?
@@ -133,7 +134,9 @@ def GetIndivStats(account_id):
                     "name":tank[0],
                     "battles":tank[2],
                     "avgDmg":tank[3],
-                    "dmgRank":GetRank(tank[3], settings.DMG_BREAKS)
+                    "dmgRank":GetRank(tank[3], settings.DMG_BREAKS),
+                    "hitPercent":tank[5],
+                    "hitPercentRank":GetRank(tank[5], settings.HIT_PERCENT_BREAKS)
                 })
         query = '''
         SELECT
