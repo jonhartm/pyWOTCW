@@ -3,7 +3,7 @@ import sys, os
 from os import path, getenv
 from dotenv import load_dotenv
 
-import secrets
+import settings
 import database
 import sqlite3 as sqlite
 
@@ -11,9 +11,9 @@ app = Flask(__name__)
 
 load_dotenv()
 
-DMG_BREAKS = [1200, 1350, 1400, 1500]
-SPOT_BREAKS = [2,4,6,8]
-ATTENDANCE_BREAKS = [.2,.4,.6,.8]
+# DMG_BREAKS = [1200, 1350, 1400, 1500]
+# SPOT_BREAKS = [2,4,6,8]
+# ATTENDANCE_BREAKS = [.2,.4,.6,.8]
 
 # if not path.isfile(".env"):
 #     raise Exception("Missing .env file...")
@@ -56,33 +56,33 @@ def GetStats():
             if p[2] is not None:
                 player['overall'] = {
                     "dmg":p[2],
-                    "rank":GetRank(p[2], DMG_BREAKS)
+                    "rank":GetRank(p[2], settings.DMG_BREAKS)
                 }
 
             if p[3] is not None:
                 player['HT'] = {
                     "dmg":p[3],
-                    "rank":GetRank(p[3], DMG_BREAKS)
+                    "rank":GetRank(p[3], settings.DMG_BREAKS)
                 }
             if p[4] is not None:
                 player['MT'] = {
                     "dmg":p[4],
-                    "rank":GetRank(p[4], DMG_BREAKS)
+                    "rank":GetRank(p[4], settings.DMG_BREAKS)
                 }
             if p[5] is not None:
                 player['LT'] = {
                     "spot":p[5],
-                    "rank":GetRank(p[5], SPOT_BREAKS)
+                    "rank":GetRank(p[5], settings.SPOT_BREAKS)
                 }
             if p[6] is not None:
                 player['TD'] = {
                     "dmg":p[6],
-                    "rank":GetRank(p[6], DMG_BREAKS)
+                    "rank":GetRank(p[6], settings.DMG_BREAKS)
                 }
             if p[7] is not None:
                 player['SPG'] = {
                     "dmg":p[7],
-                    "rank":GetRank(p[7], DMG_BREAKS)
+                    "rank":GetRank(p[7], settings.DMG_BREAKS)
                 }
             stats[p[0]] = player
     return stats
@@ -126,14 +126,14 @@ def GetIndivStats(account_id):
                     "name":tank[0],
                     "battles":tank[2],
                     "avgSpot":tank[4],
-                    "spotRank":GetRank(tank[4], SPOT_BREAKS)
+                    "spotRank":GetRank(tank[4], settings.SPOT_BREAKS)
                 })
             else:
                 stats["by_tank"][tank[1]].append({
                     "name":tank[0],
                     "battles":tank[2],
                     "avgDmg":tank[3],
-                    "dmgRank":GetRank(tank[3], DMG_BREAKS)
+                    "dmgRank":GetRank(tank[3], settings.DMG_BREAKS)
                 })
         query = '''
         SELECT
@@ -151,27 +151,27 @@ def GetIndivStats(account_id):
             stats["history"].append({
                 "overall":{
                     "dmg":hist[0],
-                    "rank":GetRank(hist[0], DMG_BREAKS)
+                    "rank":GetRank(hist[0], settings.DMG_BREAKS)
                 },
                 "HT":{
                     "dmg":hist[1],
-                    "rank":GetRank(hist[1], DMG_BREAKS)
+                    "rank":GetRank(hist[1], settings.DMG_BREAKS)
                 },
                 "MT":{
                     "dmg":hist[2],
-                    "rank":GetRank(hist[2], DMG_BREAKS)
+                    "rank":GetRank(hist[2], settings.DMG_BREAKS)
                 },
                 "LT":{
                     "spots":hist[3],
-                    "rank":GetRank(hist[3], SPOT_BREAKS)
+                    "rank":GetRank(hist[3], settings.SPOT_BREAKS)
                 },
                 "TD":{
                     "dmg":hist[4],
-                    "rank":GetRank(hist[4], DMG_BREAKS)
+                    "rank":GetRank(hist[4], settings.DMG_BREAKS)
                 },
                 "SPG":{
                     "dmg":hist[5],
-                    "rank":GetRank(hist[5], DMG_BREAKS)
+                    "rank":GetRank(hist[5], settings.DMG_BREAKS)
                 },
                 "updated":hist[6]
             })
