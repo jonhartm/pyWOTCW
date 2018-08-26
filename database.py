@@ -104,9 +104,12 @@ def ResetClan():
         	account_id INTEGER,
         	avgDmg INTEGER,
         	HTDmg INTEGER,
+            HTHitPer INTEGER,
         	MTDmg INTEGER,
+            MTHitPer INTEGER,
         	LTSpots INTEGER,
         	TDDmg INTEGER,
+            TDHitPer INTEGER,
         	SPGDmg INTEGER,
         	updated_at TIME,
 
@@ -277,7 +280,8 @@ def AddStatHistory():
         	account_id INTEGER,
         	type TEXT,
         	avgDmg INTEGER,
-        	avgSpot INTEGER
+        	avgSpot INTEGER,
+            avgHitPercent INTEGER
         );
         '''
         cur.execute(statement)
@@ -289,7 +293,8 @@ def AddStatHistory():
         		account_id,
         		type,
         		SUM(damage_dealt)/SUM(battles) AS avgDmg,
-        		ROUND(SUM(spotting)*1.0/SUM(battles),1) AS avgSpot
+        		ROUND(SUM(spotting)*1.0/SUM(battles),1) AS avgSpot,
+                ROUND(AVG(hit_percent),1) AS avgHitPercent
         	FROM (SELECT * FROM MemberStats WHERE battles > 5) AS Stats
         		JOIN Tanks ON Tanks.tank_id = Stats.tank_id
         	GROUP BY account_id, type;
@@ -301,13 +306,16 @@ def AddStatHistory():
         INSERT INTO StatHistory
         	SELECT
         		Members.account_id,
-        		Overall.avgDmg,
-        		HTstats.avgDmg AS Htdmg,
-        		MTstats.avgDmg AS MTdmg,
-        		LTstats.avgSpot AS LTSpots,
-        		TDstats.avgDmg AS TDdmg,
-        		SPGstats.avgdmg AS SPGdmg,
-        		Date() AS updated_at
+            	Overall.avgDmg,
+            	HTstats.avgDmg AS HTdmg,
+            	HTstats.avgHitPercent AS HTHitPer,
+            	MTstats.avgDmg AS MTdmg,
+            	MTstats.avgHitPercent AS MTHitPer,
+            	LTstats.avgSpot AS LTSpots,
+            	TDstats.avgDmg AS TDdmg,
+            	TDStats.avgHitPercent AS TDHitPer,
+            	SPGstats.avgdmg AS SPGdmg,
+            	Date() AS updated_at
         	FROM Members
         		LEFT JOIN (
         			SELECT
