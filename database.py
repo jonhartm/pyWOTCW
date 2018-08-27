@@ -326,7 +326,7 @@ def AddStatHistory():
         			SELECT
         				account_id,
         				SUM(damage_dealt)/SUM(battles) AS avgDmg
-        			FROM MemberStats
+        			FROM (SELECT * FROM MemberStats WHERE battles > 5)
         			GROUP BY account_id
         		) AS Overall ON Members.account_id = Overall.account_id
         		LEFT OUTER JOIN avgStats as HTstats ON
