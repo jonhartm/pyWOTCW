@@ -207,7 +207,7 @@ def UpdateMemberTankStats(account_ids):
     url = "https://api.worldoftanks.com/wot/tanks/stats/"
     params = {
     "application_id": getenv("WG_APP_ID"),
-    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.piercings, globalmap.hits",
+    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.survived_battles, globalmap.piercings, globalmap.hits",
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -229,12 +229,17 @@ def UpdateMemberTankStats(account_ids):
                 except:
                     pierce_percent = 0
 
+                try:
+                    light_rating = round((stat["globalmap"]["survived_battles"]/stat["globalmap"]["battles"])+(stat["globalmap"]["spotted"]/stat["globalmap"]["battles"]), 2)
+                except:
+                    light_rating = 0
+
                 inserts.append([
                     id,
                     stat["tank_id"],
                     stat["globalmap"]["battles"],
                     stat["globalmap"]["damage_dealt"],
-                    stat["globalmap"]["spotted"],
+                    light_rating,
                     pierce_percent
                 ])
     print("Found statistics on {} tanks...".format(len(inserts)))
@@ -298,7 +303,7 @@ def AddStatHistory():
         		account_id,
         		type,
         		SUM(damage_dealt)/SUM(battles) AS avgDmg,
-        		ROUND(SUM(spotting)*1.0/SUM(battles),1) AS avgSpot,
+        		ROUND(AVG(spotting)*1.0,2) AS avgSpot,
                 ROUND(AVG(hit_percent),1) AS avgHitPercent
         	FROM (SELECT * FROM MemberStats WHERE battles > 5) AS Stats
         		JOIN Tanks ON Tanks.tank_id = Stats.tank_id

@@ -101,7 +101,7 @@ def GetIndivStats(account_id):
         	Tanks.type,
         	battles,
         	ROUND(damage_dealt*1.0/battles, 2) AS avgDmg,
-        	ROUND(spotting*1.0/battles, 2) AS avgSpotting,
+        	spotting AS avgSpotting,
             hit_percent
         FROM MemberStats
         	JOIN Tanks ON MemberStats.tank_id = Tanks.tank_id
