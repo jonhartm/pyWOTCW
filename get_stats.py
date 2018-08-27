@@ -106,7 +106,7 @@ def GetIndivStats(account_id):
         FROM MemberStats
         	JOIN Tanks ON MemberStats.tank_id = Tanks.tank_id
         WHERE account_id = ?
-        ORDER BY type, damage_dealt
+        ORDER BY type, battles DESC
         '''
         cur.execute(query, [account_id])
         for tank in [x for x in cur.fetchall()]:
