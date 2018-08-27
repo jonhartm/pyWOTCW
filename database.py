@@ -207,7 +207,7 @@ def UpdateMemberTankStats(account_ids):
     url = "https://api.worldoftanks.com/wot/tanks/stats/"
     params = {
     "application_id": getenv("WG_APP_ID"),
-    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.hits_percents",
+    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.piercings, globalmap.hits",
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -224,13 +224,18 @@ def UpdateMemberTankStats(account_ids):
         for stat in API_data:
             # don't insert stats for tanks that have never been played in CW
             if stat["globalmap"]["battles"] > 0:
+                try:
+                    pierce_percent = round((stat["globalmap"]["piercings"]/stat["globalmap"]["hits"])*100, 1)
+                except:
+                    pierce_percent = 0
+
                 inserts.append([
                     id,
                     stat["tank_id"],
                     stat["globalmap"]["battles"],
                     stat["globalmap"]["damage_dealt"],
                     stat["globalmap"]["spotted"],
-                    stat["globalmap"]["hits_percents"]
+                    pierce_percent
                 ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
