@@ -9,6 +9,7 @@ import csv
 from datetime import datetime, timedelta
 from util import *
 from caching import *
+import get_stats
 
 Cache = CacheFile('cache.json')
 
@@ -88,6 +89,7 @@ def ResetClan():
             'damage_dealt' INTEGER,
             'spotting' INTEGER,
             'hit_percent' INTEGER,
+            'moe' INTEGER,
 
             CONSTRAINT account
                 FOREIGN KEY (account_id)
@@ -204,44 +206,78 @@ def GetTankIDs(tier, ids=None):
 
 def UpdateMemberTankStats(account_ids):
     # load tank stats for every account id passed in
-    url = "https://api.worldoftanks.com/wot/tanks/stats/"
-    params = {
+    stats_url = "https://api.worldoftanks.com/wot/tanks/stats/"
+    stats_params = {
     "application_id": getenv("WG_APP_ID"),
     "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.survived_battles, globalmap.piercings, globalmap.hits",
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
+
+    # load moe achievements for each account id passed in
+    moe_url = "https://api.worldoftanks.com/wot/tanks/achievements/"
+    moe_params = {
+    "application_id": getenv("WG_APP_ID"),
+    "fields": "tank_id, achievements",
+    "tank_id": ','.join(GetTankIDs(10, [16161]))
+    }
+
     inserts = []
     for id in account_ids:
-        params["account_id"] = str(id)
+        stats_params["account_id"] = str(id)
         print("Loading member details for account id {}".format(id))
-        API_data = Cache.CheckCache_API(
-            url,
-            params,
+        API_stats_data = Cache.CheckCache_API(
+            stats_url,
+            stats_params,
             max_age=dt.timedelta(hours=23),
             rate_limit=True
         )["data"][str(id)]
-        for stat in API_data:
+
+        print("Loading member MOE details for account id {}".format(id))
+        moe_params["account_id"] = str(id)
+        API_moe_data = Cache.CheckCache_API(
+            moe_url,
+            moe_params,
+            max_age=dt.timedelta(hours=23),
+            rate_limit=True
+        )["data"][str(id)]
+
+        player_tanks = get_stats.GetPlayerTanks(id)
+
+        for stat in API_stats_data:
             # don't insert stats for tanks that have never been played in CW
-            if stat["globalmap"]["battles"] > 0:
-                try:
-                    pierce_percent = round((stat["globalmap"]["piercings"]/stat["globalmap"]["hits"])*100, 1)
-                except:
-                    pierce_percent = 0
+            try:
+                pierce_percent = round((stat["globalmap"]["piercings"]/stat["globalmap"]["hits"])*100, 1)
+            except:
+                pierce_percent = 0
 
-                try:
-                    light_rating = round((stat["globalmap"]["survived_battles"]/stat["globalmap"]["battles"])+(stat["globalmap"]["spotted"]/stat["globalmap"]["battles"]), 2)
-                except:
-                    light_rating = 0
+            try:
+                light_rating = round((stat["globalmap"]["survived_battles"]/stat["globalmap"]["battles"])+(stat["globalmap"]["spotted"]/stat["globalmap"]["battles"]), 2)
+            except:
+                light_rating = 0
 
-                inserts.append([
-                    id,
-                    stat["tank_id"],
-                    stat["globalmap"]["battles"],
-                    stat["globalmap"]["damage_dealt"],
-                    light_rating,
-                    pierce_percent
-                ])
+            marks = 0
+            for x in API_moe_data:
+                if x["tank_id"] == stat["tank_id"]:
+                    if "marksOnGun" in x["achievements"]:
+                        marks = int(x["achievements"]["marksOnGun"])
+
+            # is this a new tank for this player?
+            if stat["tank_id"] not in player_tanks.keys():
+                print("{}: this is a new tank for player {}...".format(stat["tank_id"], id))
+            # if this is not a new tank, has the player earned a new mark?
+            elif marks != player_tanks[stat["tank_id"]]:
+                print("{}: player {} has earned a new mark...".format(stat["tank_id"], id))
+
+            inserts.append([
+                id,
+                stat["tank_id"],
+                stat["globalmap"]["battles"],
+                stat["globalmap"]["damage_dealt"],
+                light_rating,
+                pierce_percent,
+                marks
+            ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
     t = Timer()
@@ -251,7 +287,7 @@ def UpdateMemberTankStats(account_ids):
         # Clear the table
         cur.execute("DELETE FROM MemberStats")
 
-        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?)", inserts)
         conn.commit()
     t.Stop()
     print("Statistics added to DB in {}.".format(t))
