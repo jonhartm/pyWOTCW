@@ -173,7 +173,4 @@ def GetPlayerTanks(account_id):
     with database.GetConnection() as conn:
         cur = conn.cursor()
         cur.execute('SELECT tank_id, moe FROM MemberStats where account_id = ?', [account_id])
-        # ret_val = {}
-        # for t in cur.fetchall():
-        #     ret_val[t[0]] = t[1]
         return {k:v for k,v in cur.fetchall()}
