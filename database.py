@@ -244,6 +244,9 @@ def UpdateMemberTankStats(account_ids):
 
         player_tanks = get_stats.GetPlayerTanks(id)
 
+        if API_stats_data is None:
+            continue
+
         for stat in API_stats_data:
             # don't insert stats for tanks that have never been played in CW
             try:
