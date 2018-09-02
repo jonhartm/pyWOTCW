@@ -37,7 +37,8 @@ def ResetTanks(force_update=False):
             'tank_id' INTEGER NOT NULL PRIMARY KEY,
             'tier' INTEGER,
             'type' TEXT,
-            'name' TEXT
+            'name' TEXT,
+            'meta' INTEGER
         );
         '''
         cur.execute(statement)
@@ -57,7 +58,7 @@ def ResetTanks(force_update=False):
                 API_data[tank]["type"],
                 API_data[tank]["name"]
             ])
-        statement = 'INSERT INTO Tanks VALUES (?,?,?,?)'
+        statement = 'INSERT INTO Tanks VALUES (?,?,?,?,1)'
         cur.executemany(statement, inserts)
 
         # jinja doesn't like hypens in keys.

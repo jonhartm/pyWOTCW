@@ -7,6 +7,7 @@ import settings
 import database
 import get_stats as stats
 import sqlite3 as sqlite
+from util import *
 
 app = Flask(__name__)
 
@@ -46,6 +47,14 @@ def player(account_id):
         stat_hist=indv_stats["history"]
         )
 
+@app.route('/meta_tanks', methods=['GET', 'POST'])
+def meta_tanks():
+    tank_list = getDictFromListWithIndex(stats.GetAllTanks(10, [16161]), 4)
+    return render_template(
+        "set_meta_tanks.html",
+        tank_list = tank_list
+        )
+
 
 if __name__=="__main__":
     if len(sys.argv) > 1:
@@ -66,6 +75,9 @@ if __name__=="__main__":
             else:
                 print(stats.GetStats())
         else:
-            pass # test functions here
+            tank_list = stats.GetAllTanks(10, [16161])
+            tank_dict = getDictFromListWithIndex(tank_list, 4)
+            # print(tank_dict)
+
     else:
         app.run(debug=True)

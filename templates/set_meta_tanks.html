@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Set Meta Tanks</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <ul>
+
+    {% for rank, tanks in tank_list%}
+    <p>{{rank}}</p>
+      <ul>
+        {% for tank in tanks %}
+          <li>
+            <span>{{tank[3]}}</span>
+            <input type=hidden value={{tank[0]}}>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </ul>
+</body>
+<footer>
+  <script
+	  src="https://code.jquery.com/jquery-3.3.1.min.js"
+	  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	  crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</footer>

@@ -174,3 +174,15 @@ def GetPlayerTanks(account_id):
         cur = conn.cursor()
         cur.execute('SELECT tank_id, moe FROM MemberStats where account_id = ?', [account_id])
         return {k:v for k,v in cur.fetchall()}
+
+def GetAllTanks(tier, ids=None):
+    with database.GetConnection() as conn:
+        cur = conn.cursor()
+        if ids is None:
+            query = "SELECT tank_id FROM Tanks WHERE tier = ?"
+            cur.execute(query, [tier])
+        else:
+            id_list = ','.join([str(x) for x in ids])
+            query = "SELECT * FROM Tanks WHERE tier = ? OR tank_id IN (?)"
+            cur.execute(query, [tier, id_list])
+        return cur.fetchall()

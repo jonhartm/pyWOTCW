@@ -19,3 +19,15 @@ class Timer():
 
     def __str__(self):
         return '{:.3}s'.format(self.elapsed)
+
+# parses a list of lists and returns a dictionary based on the key index
+# e.g. func([[1,A,2][2,A,4]], 1) would return {A:[[1,A,2][2,A,4]]}
+def getDictFromListWithIndex(item_list, key_index):
+    new_dict = {}
+    for item in item_list:
+        item = list(item)
+        if item[key_index] not in new_dict:
+            new_dict[item[key_index]] = []
+        index = item.pop(key_index)
+        new_dict[index].append(item)
+    return sorted(new_dict.items())
