@@ -5,25 +5,31 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <ul>
-
+  <button type="button" class="btn" value="submit" id="btn_submit">Submit</button>
+  <div class=list-container>
     {% for rank, tanks in tank_list%}
-    <p>{{rank}}</p>
-      <ul>
-        {% for tank in tanks %}
-          <li>
-            <span>{{tank[3]}}</span>
-            <input type=hidden value={{tank[0]}}>
-          </li>
-        {% endfor %}
-      </ul>
+      <div class=tank-list-container>
+        <h1>Tier {{rank}}</h1>
+        <ul class=sortable>
+          {% for tank in tanks %}
+            <li>
+              <span>{{tank[3]}}</span>
+              <input type=hidden value={{tank[0]}}>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 </body>
 <footer>
   <script
 	  src="https://code.jquery.com/jquery-3.3.1.min.js"
 	  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	  crossorigin="anonymous"></script>
+  <script
+	  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+	  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
 	  crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </footer>

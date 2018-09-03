@@ -53,6 +53,42 @@
   color: #eee;
 }
 
+.list-container {
+  border: 1px solid #eee;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  margin: auto;
+  width: 95vw;
+}
+.list-container h1 {
+  text-align: center;
+}
+.list-container .sortable {
+  background-color: #f6f6f6;
+  border: 1px solid #eee;
+  list-style-type: none;
+  margin: 0;
+  margin-right: 10px;
+  min-height: 20px;
+  padding: 5px 0 0;
+  width: 220px;
+}
+.list-container .sortable li {
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  font-size: 1.2em;
+  margin: 0 5px 5px;
+  padding: 5px;
+  text-align: center;
+  width: 200px;
+}
+.list-container .sortable li:hover {
+  background-color: #ccc;
+  cursor: move;
+}
+
 .controls {
   margin: auto;
   width: 20%;

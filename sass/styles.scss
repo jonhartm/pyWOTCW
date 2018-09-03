@@ -61,6 +61,46 @@
   }
 }
 
+.list-container {
+  border: 1px solid $light-grey;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  margin: auto;
+  width: 95vw;
+
+  h1 {
+    text-align: center;
+  }
+
+  .sortable {
+    background-color: $very-light-grey;
+    border: 1px solid $light-grey;
+    list-style-type: none;
+    margin: 0;
+    margin-right: 10px;
+    min-height: 20px;
+    padding: 5px 0 0;
+    width: 220px;
+
+    li {
+      background-color: $white;
+      border: 1px solid $light-grey;
+      border-radius: 4px;
+      font-size: 1.2em;
+      margin: 0 5px 5px;
+      padding: 5px;
+      text-align: center;
+      width: 200px;
+
+      &:hover {
+        background-color: $dark-grey;
+        cursor: move;
+      }
+    }
+  }
+}
+
 .controls {
   margin: auto;
   width: 20%;
