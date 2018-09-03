@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from util import *
 from caching import *
 import get_stats
+import settings
 
 Cache = CacheFile('cache.json')
 
@@ -65,6 +66,22 @@ def ResetTanks(force_update=False):
         statement = 'UPDATE Tanks SET type="TD" WHERE type="AT-SPG"'
         cur.execute(statement)
         conn.commit()
+
+# Update the Tanks table to reflect the current state of the META_TANK_RANKS setting
+def UpdateTankMetaRanks():
+    with GetConnection() as conn:
+        cur = conn.cursor()
+        updates = []
+        for rank, tanks in settings.options["META_TANK_RANKS"].items():
+            for tank_id in tanks:
+                updates.append([
+                    rank,
+                    tank_id
+                ])
+        statement = 'UPDATE Tanks SET meta=? WHERE tank_id=?'
+        cur.executemany(statement, updates)
+        conn.commit()
+
 
 # drops all data about clan members and re-fills from API calls
 # basically a full reset minus the tanks call.

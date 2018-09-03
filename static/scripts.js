@@ -21,6 +21,7 @@ $("#btn_submit").click(function() {
   var data = {}
   $.each($(".tank-list-container"), function() {
     var tier = $(this).find("h1").text();
+    tier = tier.split(" ")[1];
     data[tier] = [];
     $.each($(this).find("input"), function() {
       data[tier].push($(this).val());
@@ -28,12 +29,15 @@ $("#btn_submit").click(function() {
   });
   console.log(data);
 
+  // make a post request to set_meta_tanks to store the settings
   $.ajax({
-    url:'/meta_tanks',
-    data: data,
+    url:'/set_meta_tanks',
+    data: JSON.stringify(data),
+    contentType: "application/json",
+    datatype: "json",
     type: 'POST',
     success: function(response) {
-      console.log(response);
+      console.log(response)
     },
     error: function(error) {
       console.log(error);

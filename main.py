@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response
 import sys, os
 from os import path, getenv
 from dotenv import load_dotenv
 
 import settings
 import database
+import json
 import get_stats as stats
 import sqlite3 as sqlite
 from util import *
@@ -55,6 +56,18 @@ def meta_tanks():
         tank_list = tank_list
         )
 
+@app.route('/set_meta_tanks', methods=['POST'])
+def set_meta_tanks():
+    data = request.get_json()
+    resp = make_response(json.dumps(data))
+    try:
+        settings.Set("META_TANK_RANKS", data)
+        database.UpdateTankMetaRanks()
+        resp.status_code = 200
+    except Exception as e:
+        resp.status = "AAA"
+        resp.status_code = 400
+    return resp
 
 if __name__=="__main__":
     if len(sys.argv) > 1:
@@ -75,9 +88,8 @@ if __name__=="__main__":
             else:
                 print(stats.GetStats())
         else:
-            tank_list = stats.GetAllTanks(10, [16161])
-            tank_dict = getDictFromListWithIndex(tank_list, 4)
-            # print(tank_dict)
+            settings.Set("DMG_BREAKS", "diff val")
+            print(settings.options["DMG_BREAKS"])
 
     else:
         app.run(debug=True)
