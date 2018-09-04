@@ -161,6 +161,7 @@ def ResetClan():
             new_val INTEGER,
             date_reached TIME,
             date_confirmed TIME,
+            payout INTEGER,
 
             PRIMARY KEY (account_id, tank_id, achv_type),
             CONSTRAINT account
@@ -356,7 +357,7 @@ def UpdateMemberTankStats(account_ids):
         cur.execute("DELETE FROM MemberStats")
 
         cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?)", inserts)
-        cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL)", moe_inserts)
+        cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
         conn.commit()
     t.Stop()
     print("Statistics added to DB in {}.".format(t))
