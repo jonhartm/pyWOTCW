@@ -186,3 +186,56 @@ def GetAllTanks(tier, ids=None):
             query = "SELECT * FROM Tanks WHERE tier = ? OR tank_id IN (?)"
             cur.execute(query, [tier, id_list])
         return cur.fetchall()
+
+# Gets entries from the MOE Table
+# If the 'date_confirmed' field is empty, then the player has not been compensated, and
+# we do a quick calculation using the settings file to see what the player is owed.
+def GetMOEHistory():
+    ret_val = {
+        "to_pay":[],
+        "log":[]
+    }
+    with database.GetConnection() as conn:
+        cur = conn.cursor()
+        query = '''
+        SELECT
+        	nickname,
+        	Tanks.name,
+        	achv_type,
+        	old_val,
+        	new_val,
+        	date_reached,
+        	date_confirmed,
+            Tanks.meta,
+            payout
+        FROM MOEHistory
+        	JOIN Members ON Members.account_id = MOEHistory.account_id
+        	JOIN Tanks ON Tanks.tank_id = MOEHistory.tank_id
+        ORDER BY date_confirmed, date_reached
+        '''
+        cur.execute(query)
+        for hist in cur.fetchall():
+            hist = list(hist)
+            # if this player hasn't been marked as paid yet
+            payout = 0
+            if hist[6] is None:
+                # is this a tank purchase?
+                if hist[2] == "tank" and hist[7] < 4: # no payouts for meta 4 or 5 tanks
+                    payout_base = settings.options["PAYOUT_MULTIPLIERS"]["Purchase"]
+                    meta_mutiplier = settings.options["PAYOUT_BY_META"][hist[7]-1]
+                    payout = int(round(payout_base * meta_mutiplier,0))
+                elif hist[2] == "moe": # payout for MOE gain
+                    if hist[4] == 1: payout_base = settings.options["PAYOUT_MULTIPLIERS"]["1st Mark"]
+                    elif hist[4] == 2: payout_base = settings.options["PAYOUT_MULTIPLIERS"]["2nd Mark"]
+                    elif hist[4] == 3: payout_base = settings.options["PAYOUT_MULTIPLIERS"]["3rd Mark"]
+                    else: raise Exception("Unknown indicator in MOEHistory(new_val): {}".format(hist[4]))
+                    meta_mutiplier = settings.options["PAYOUT_BY_META"][hist[7]-1]
+                    payout = int(round(payout_base * meta_mutiplier,0))
+                else:
+                    raise Exception("Unknown Achievement type in MOEHistory: {}".format(hist[2]))
+            hist.append(payout)
+            if hist[6] is None:
+                ret_val["to_pay"].append(hist)
+            else:
+                ret_val["log"].append(hist)
+    return ret_val
