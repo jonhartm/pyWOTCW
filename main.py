@@ -84,6 +84,8 @@ if __name__=="__main__":
             if len(sys.argv) > 2:
                 if sys.argv[2] == "-tanks":
                     database.ResetTanks(True)
+                elif sys.argv[2] == "-marks":
+                    database.ResetMOEHistory()
             else:
                 if input("This will reset the entire database - are you sure? (y/n): ").lower() == "y":
                     database.InitializeAll()

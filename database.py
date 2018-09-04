@@ -151,6 +151,14 @@ def ResetClan():
         print("Creating Table 'StatHistory'")
         cur.execute(statement)
 
+        ResetMOEHistory()
+
+    UpdateClanMembers()
+
+# Drop and re-create the MOEHistory table
+def ResetMOEHistory():
+    with GetConnection() as conn:
+        cur = conn.cursor()
         DropTable("MOEHistory", cur)
         statement = '''
         CREATE TABLE MOEHistory (
@@ -172,8 +180,6 @@ def ResetClan():
         '''
         print("Creating Table 'MOEHistory'")
         cur.execute(statement)
-
-    UpdateClanMembers()
 
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
 # Compares the retrieved list with the current database. New members are added, missing members
