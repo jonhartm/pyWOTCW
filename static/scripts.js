@@ -27,8 +27,8 @@ $("#btn_submit").click(function() {
       data[tier].push($(this).val());
     })
   });
-  console.log(data);
 
+  var flashMessage = $(".flash");
   // make a post request to set_meta_tanks to store the settings
   $.ajax({
     url:'/set_meta_tanks',
@@ -37,10 +37,15 @@ $("#btn_submit").click(function() {
     datatype: "json",
     type: 'POST',
     success: function(response) {
-      console.log(response)
+      flashMessage.addClass("success");
+      flashMessage.fadeIn();
+      flashMessage.text("Database Updated");
     },
     error: function(error) {
       console.log(error);
+      flashMessage.addClass("error");
+      flashMessage.fadeIn();
+      flashMessage.text("Error Updating Database");
     }
   })
 });

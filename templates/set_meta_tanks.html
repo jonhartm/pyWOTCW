@@ -5,6 +5,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+  {% include 'flash.html '%}
   <button type="button" class="btn" value="submit" id="btn_submit">Submit</button>
   <div class=list-container>
     {% for rank, tanks in tank_list%}
