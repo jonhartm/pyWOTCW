@@ -7,6 +7,23 @@
     transform: translate(2px, 2px);
   }
 }
+.btn {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 3px;
+}
+.btn:hover {
+  background-color: #aef;
+}
+.btn.center {
+  display: block;
+  font-size: 150%;
+  margin: 5px auto;
+  width: 90%;
+}
+
 .flash {
   border-radius: 10px;
   border-style: solid;

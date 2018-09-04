@@ -1,0 +1,21 @@
+// Styles for buttons
+@import '../modules/colors';
+
+.btn {
+  background-color: $white;
+  border: 1px solid $dark-grey;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 3px;
+
+  &:hover {
+    background-color: $light-blue;
+  }
+
+  &.center {
+    display: block;
+    font-size: 150%;
+    margin: 5px auto;
+    width: 90%;
+  }
+}

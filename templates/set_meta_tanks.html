@@ -6,7 +6,9 @@
 </head>
 <body>
   {% include 'flash.html '%}
-  <button type="button" class="btn" value="submit" id="btn_submit">Submit</button>
+  <p>
+    Drag tanks between lists and press "Submit" at the bottom when done.
+  </p>
   <div class=list-container>
     {% for rank, tanks in tank_list%}
       <div class=tank-list-container>
@@ -22,6 +24,7 @@
       </div>
     {% endfor %}
   </div>
+  <button type="button" class="btn center" value="submit" id="btn_submit">Submit</button>
 </body>
 <footer>
   <script
