@@ -143,6 +143,27 @@ def ResetClan():
         print("Creating Table 'StatHistory'")
         cur.execute(statement)
 
+        DropTable("MOEHistory", cur)
+        statement = '''
+        CREATE TABLE MOEHistory (
+            account_id INTEGER,
+            tank_id INTEGER,
+            achv_type TEXT,
+            old_val INTEGER,
+            new_val INTEGER,
+            date_reached TIME,
+            date_confirmed TIME,
+
+            PRIMARY KEY (account_id, tank_id, achv_type),
+            CONSTRAINT account
+                FOREIGN KEY (account_id)
+                REFERENCES Members(account_id)
+                ON DELETE CASCADE
+        )
+        '''
+        print("Creating Table 'MOEHistory'")
+        cur.execute(statement)
+
     UpdateClanMembers()
 
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
@@ -241,6 +262,7 @@ def UpdateMemberTankStats(account_ids):
     }
 
     inserts = []
+    moe_inserts = []
     print("Loading details for {} accounts...".format(len(account_ids)))
     for id in account_ids:
         stats_params["account_id"] = str(id)
@@ -287,9 +309,25 @@ def UpdateMemberTankStats(account_ids):
             # is this a new tank for this player?
             if stat["tank_id"] not in player_tanks.keys():
                 print("{}: this is a new tank for player {}...".format(stat["tank_id"], id))
+                moe_inserts.append([
+                    id,
+                    stat["tank_id"],
+                    "tank",
+                    0,
+                    1,
+                    dt.datetime.now().strftime("%Y-%m-%d")
+                ])
             # if this is not a new tank, has the player earned a new mark?
             elif marks != player_tanks[stat["tank_id"]]:
                 print("{}: player {} has earned a new mark...".format(stat["tank_id"], id))
+                moe_inserts.append([
+                    id,
+                    stat["tank_id"],
+                    "moe",
+                    player_tanks[stat["tank_id"]],
+                    marks,
+                    dt.datetime.now().strftime("%Y-%m-%d")
+                ])
 
             inserts.append([
                 id,
@@ -310,6 +348,7 @@ def UpdateMemberTankStats(account_ids):
         cur.execute("DELETE FROM MemberStats")
 
         cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL)", moe_inserts)
         conn.commit()
     t.Stop()
     print("Statistics added to DB in {}.".format(t))
