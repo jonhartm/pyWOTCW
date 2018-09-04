@@ -53,13 +53,21 @@ def ResetTanks(force_update=False):
         API_data =  Cache.CheckCache_API(url, params, force_update=force_update)["data"]
         inserts = []
         for tank in API_data:
+            meta = 0
+            for meta_rank, tanks in settings.options["META_TANK_RANKS"].items():
+                # print("Tank_ID: {}".format(tank))
+                if tank in tanks:
+                    # print("Found {} in {} - meta {}".format(tank, tanks, meta_rank))
+                    meta = meta_rank
+
             inserts.append([
                 tank,
                 API_data[tank]["tier"],
                 API_data[tank]["type"],
-                API_data[tank]["name"]
+                API_data[tank]["name"],
+                meta
             ])
-        statement = 'INSERT INTO Tanks VALUES (?,?,?,?,1)'
+        statement = 'INSERT INTO Tanks VALUES (?,?,?,?,?)'
         cur.executemany(statement, inserts)
 
         # jinja doesn't like hypens in keys.
