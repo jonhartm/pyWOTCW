@@ -10,7 +10,7 @@ import json
 from bs4 import BeautifulSoup
 
 class CacheFile():
-    def __init__(self, filename, print_info=True):
+    def __init__(self, filename, print_info=False):
         self.filename = filename
         self.API_cache = {}
         self.print_info = print_info

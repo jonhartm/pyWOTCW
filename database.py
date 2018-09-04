@@ -241,9 +241,10 @@ def UpdateMemberTankStats(account_ids):
     }
 
     inserts = []
+    print("Loading details for {} accounts...".format(len(account_ids)))
     for id in account_ids:
         stats_params["account_id"] = str(id)
-        print("Loading member details for account id {}".format(id))
+        # print("Loading member details for account id {}".format(id))
         API_stats_data = Cache.CheckCache_API(
             stats_url,
             stats_params,
@@ -251,7 +252,7 @@ def UpdateMemberTankStats(account_ids):
             rate_limit=True
         )["data"][str(id)]
 
-        print("Loading member MOE details for account id {}".format(id))
+        # print("Loading member MOE details for account id {}".format(id))
         moe_params["account_id"] = str(id)
         API_moe_data = Cache.CheckCache_API(
             moe_url,
