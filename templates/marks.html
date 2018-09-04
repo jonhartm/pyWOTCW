@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Player History - Vehicle Purchases and Marks of Excellence</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  {% include 'flash.html '%}
+  <table class="ratings-table">
+    <th>Player</th>
+    <th>Tank</th>
+    <th>Achievement</th>
+    <th>Date Reached</th>
+    <th>Payout Owed</th>
+    {% for item in moe_stats.to_pay %}
+    <tr>
+      <td>{{item[0]}}</td>
+      <td>{{item[1]}}</td>
+      <td>
+        {% if item[2] == "tank" %}
+          Purchased Tank
+        {% elif item[2] == "moe" %}
+          New Mark ({{item[3]}} > {{item[4]}})
+        {% else %}
+          ERR FIX ME PLS
+        {% endif %}
+      </td>
+      <td>{{item[5]}}</td>
+      <td>{{item[9]}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <table class="ratings-table">
+    <th>Player</th>
+    <th>Tank</th>
+    <th>Achievement</th>
+    <th>Date Paid</th>
+    <th>Payment</th>
+    {% for item in moe_stats.log %}
+    <tr>
+      <td>{{item[0]}}</td>
+      <td>{{item[1]}}</td>
+      <td>
+        {% if item[2] == "tank" %}
+          Purchased Tank
+        {% elif item[2] == "moe" %}
+          New Mark ({{item[3]}} > {{item[4]}})
+        {% else %}
+          ERR FIX ME PLS
+        {% endif %}
+      </td>
+      <td>{{item[6]}}</td>
+      <td>{{item[8]}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+<footer>
+  <script
+	  src="https://code.jquery.com/jquery-3.3.1.min.js"
+	  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	  crossorigin="anonymous"></script>
+  <script
+	  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+	  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+	  crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</footer>

@@ -70,6 +70,14 @@ def set_meta_tanks():
         resp.status_code = 400
     return resp
 
+@app.route('/marks')
+def marks():
+    return render_template(
+        'marks.html',
+        moe_stats = stats.GetMOEHistory()
+
+    )
+
 if __name__=="__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "-reset":
@@ -89,8 +97,7 @@ if __name__=="__main__":
             else:
                 print(stats.GetStats())
         else:
-            settings.Set("DMG_BREAKS", "diff val")
-            print(settings.options["DMG_BREAKS"])
+            print(stats.GetMOEHistory())
 
     else:
         app.run(debug=True)

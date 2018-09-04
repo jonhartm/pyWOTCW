@@ -16,12 +16,19 @@ if not os.path.isfile(settings_file):
         "HIT_PERCENT_BREAKS":[60.3,64.8,69.2,73.2],
         "META_TANK_RANKS":
         {
-        5:[],
-        4:[],
-        3:[],
-        2:[],
-        1:[]
-        }
+            5:[],
+            4:[],
+            3:[],
+            2:[],
+            1:[]
+        },
+        "PAYOUT_MULTIPLIERS":{
+            "Purchase":1,
+            "1st Mark":2.5,
+            "2nd Mark":5,
+            "3rd Mark":10
+        },
+        "PAYOUT_BY_META":[100,25,10,5,1]
         }, f)
 
 def Set(key, value):
