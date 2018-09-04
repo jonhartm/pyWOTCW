@@ -10,9 +10,10 @@ import get_stats as stats
 import sqlite3 as sqlite
 from util import *
 
-app = Flask(__name__)
-
 load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = getenv("FLASK_SECRET_KEY")
 
 # DMG_BREAKS = [1200, 1350, 1400, 1500]
 # SPOT_BREAKS = [2,4,6,8]
