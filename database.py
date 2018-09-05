@@ -106,25 +106,7 @@ def ResetClan():
         print("Creating Table 'Members'")
         cur.execute(statement)
 
-        DropTable("MemberStats", cur)
-        statement = '''
-        CREATE TABLE "MemberStats" (
-            'account_id' INTEGER NOT NULL,
-            'tank_id' INTEGER NOT NULL,
-            'battles' INTEGER,
-            'damage_dealt' INTEGER,
-            'spotting' INTEGER,
-            'hit_percent' INTEGER,
-            'moe' INTEGER,
-
-            CONSTRAINT account
-                FOREIGN KEY (account_id)
-                REFERENCES Members(account_id)
-                ON DELETE CASCADE
-        );
-        '''
-        print("Creating Table 'MemberStats'")
-        cur.execute(statement)
+        ResetMemberStats()
 
         DropTable("StatHistory", cur)
         statement = '''
@@ -155,6 +137,29 @@ def ResetClan():
 
     UpdateClanMembers()
 
+def ResetMemberStats():
+    with GetConnection() as conn:
+        cur = conn.cursor()
+        DropTable("MemberStats", cur)
+        statement = '''
+        CREATE TABLE "MemberStats" (
+            'account_id' INTEGER NOT NULL,
+            'tank_id' INTEGER NOT NULL,
+            'battles' INTEGER,
+            'damage_dealt' INTEGER,
+            'spotting' INTEGER,
+            'hit_percent' INTEGER,
+            'moe' INTEGER,
+
+            CONSTRAINT account
+                FOREIGN KEY (account_id)
+                REFERENCES Members(account_id)
+                ON DELETE CASCADE
+        );
+        '''
+        print("Creating Table 'MemberStats'")
+        cur.execute(statement)
+
 # Drop and re-create the MOEHistory table
 def ResetMOEHistory():
     with GetConnection() as conn:
@@ -184,7 +189,7 @@ def ResetMOEHistory():
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
 # Compares the retrieved list with the current database. New members are added, missing members
 # are removed. Details of each are printed.
-def UpdateClanMembers():
+def UpdateClanMembers(skip_marks=False):
     with GetConnection() as conn:
         cur = conn.cursor()
 
@@ -241,7 +246,7 @@ def UpdateClanMembers():
         print("Clan details loaded in {}".format(t))
 
         # Load the stats for all of the members pulled in with the API
-        UpdateMemberTankStats([x["account_id"] for x in API_data])
+        UpdateMemberTankStats([x["account_id"] for x in API_data], skip_marks)
 
 # params: tier - integer between 1 and 10
 #         ids - (optional) a list of integers to include in addition to the tier selected
@@ -258,7 +263,7 @@ def GetTankIDs(tier, ids=None):
             cur.execute(query, [tier, id_list])
         return [str(x[0]) for x in cur]
 
-def UpdateMemberTankStats(account_ids):
+def UpdateMemberTankStats(account_ids, skip_marks=False):
     # load tank stats for every account id passed in
     stats_url = "https://api.worldoftanks.com/wot/tanks/stats/"
     stats_params = {
@@ -363,7 +368,9 @@ def UpdateMemberTankStats(account_ids):
         cur.execute("DELETE FROM MemberStats")
 
         cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?)", inserts)
-        cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
+
+        if not skip_marks:
+            cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
         conn.commit()
     t.Stop()
     print("Statistics added to DB in {}.".format(t))

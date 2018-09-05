@@ -84,6 +84,8 @@ if __name__=="__main__":
             if len(sys.argv) > 2:
                 if sys.argv[2] == "-tanks":
                     database.ResetTanks(True)
+                elif sys.argv[2] == "-stats":
+                    database.ResetMemberStats()
                 elif sys.argv[2] == "-marks":
                     database.ResetMOEHistory()
             else:
@@ -91,8 +93,12 @@ if __name__=="__main__":
                     database.InitializeAll()
 
         elif sys.argv[1] == "-update":
-            print("Updating database...")
-            database.UpdateClanMembers()
+            if len(sys.argv) > 2:
+                if sys.argv[2] == "-skipMOE":
+                    database.UpdateClanMembers(True)
+            else:
+                print("Updating database...")
+                database.UpdateClanMembers()
         elif sys.argv[1] == "-stats":
             if len(sys.argv) == 3:
                 print(stats.GetIndivStats(sys.argv[2]))
