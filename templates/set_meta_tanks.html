@@ -5,7 +5,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  {% include 'flash.html '%}
+  <div class="flash" style="display:none;">
+    Placeholder Text
+  </div>
   <p>
     Drag tanks between lists and press "Submit" at the bottom when done.
   </p>
