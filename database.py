@@ -176,7 +176,6 @@ def ResetMOEHistory():
             date_confirmed TIME,
             payout INTEGER,
 
-            PRIMARY KEY (account_id, tank_id, achv_type),
             CONSTRAINT account
                 FOREIGN KEY (account_id)
                 REFERENCES Members(account_id)
