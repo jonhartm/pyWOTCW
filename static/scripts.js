@@ -50,6 +50,34 @@ $("#btn_submit").click(function() {
   })
 });
 
+$(".mark_paid").click(function() {
+  var containing_row = $(this).parents("tr");
+  var payout = containing_row.find(".payout_owed").text();
+
+  var sender = $(this);
+
+  $.ajax({
+    url:'/mark_payment',
+    data: JSON.stringify(
+      {
+        "id":$(this).val(),
+        "payout":payout
+      }
+    ),
+    contentType: "application/json",
+    datatype: "json",
+    type: 'POST',
+    success: function(response) {
+      sender.prop("disabled", true);
+      sender.text("Payout Marked");
+      sender.addClass("btn_disabled");
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  })
+})
+
 function swap_values(sender) {
   var old_val = sender.find("span").text();
   var new_val = sender.find("input").val();

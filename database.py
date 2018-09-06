@@ -185,6 +185,18 @@ def ResetMOEHistory():
         print("Creating Table 'MOEHistory'")
         cur.execute(statement)
 
+def MarkMOEPayment(id, payment):
+    with GetConnection() as conn:
+        cur = conn.cursor()
+        query = '''
+        UPDATE MOEHistory
+        SET date_confirmed = datetime('now'), payout = ?
+        WHERE MOEHistory.rowid = ?
+        '''
+        cur.execute(query, [payment, id])
+        conn.commit()
+
+
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
 # Compares the retrieved list with the current database. New members are added, missing members
 # are removed. Details of each are printed.

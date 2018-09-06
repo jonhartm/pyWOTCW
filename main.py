@@ -83,6 +83,13 @@ def marks():
 
     )
 
+@app.route('/mark_payment', methods=['POST'])
+def mark_payment():
+    data = request.get_json()
+    database.MarkMOEPayment(data["id"], data["payout"])
+    resp = make_response(json.dumps(data))
+    return resp
+
 if __name__=="__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "-reset":
@@ -110,7 +117,16 @@ if __name__=="__main__":
             else:
                 print(stats.GetStats())
         else:
-            print(stats.GetMOEHistory())
+            tank_list = getDictFromListWithIndex(stats.GetAllTanks(10, [16161]), 4)
+
+            sorted_tanklist = {}
+            for tanks in tank_list:
+                tanks = list(tanks)
+                tanks[1] = sorted(tanks[1], key=lambda x: (x[2], x[3]))
+                sorted_tanklist[tanks[0]] = tanks[1]
+            print(sorted_tanklist)
+
+
 
     else:
         app.run(debug=True)

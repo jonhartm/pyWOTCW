@@ -14,6 +14,7 @@
     <th>Achievement</th>
     <th>Date Reached</th>
     <th>Payout Owed</th>
+    <th>Mark As Paid</th>
     {% for item in moe_stats.to_pay %}
     <tr>
       <td>{{item[0]}}</td>
@@ -28,7 +29,10 @@
         {% endif %}
       </td>
       <td>{{item[5]}}</td>
-      <td>{{item[9]}}</td>
+      <td class="payout_owed">{{item[10]}}</td>
+      <td>
+        <button type="button" class="btn mark_paid" value={{item[9]}}>Submit</button>
+      </td>
     </tr>
     {% endfor %}
   </table>

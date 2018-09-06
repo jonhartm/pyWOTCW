@@ -207,7 +207,8 @@ def GetMOEHistory():
         	date_reached,
         	date_confirmed,
             Tanks.meta,
-            payout
+            payout,
+            MOEHistory.rowid
         FROM MOEHistory
         	JOIN Members ON Members.account_id = MOEHistory.account_id
         	JOIN Tanks ON Tanks.tank_id = MOEHistory.tank_id

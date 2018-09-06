@@ -14,7 +14,7 @@
   margin: 5px;
   padding: 3px;
 }
-.btn:hover {
+.btn:hover:not(.btn_disabled) {
   background-color: #aef;
 }
 .btn.center {

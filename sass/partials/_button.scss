@@ -9,7 +9,9 @@
   padding: 3px;
 
   &:hover {
-    background-color: $light-blue;
+    &:not(.btn_disabled) {
+      background-color: $light-blue;
+    }
   }
 
   &.center {
