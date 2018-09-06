@@ -220,10 +220,11 @@ def GetMOEHistory():
             payout = 0
             if hist[6] is None:
                 # is this a tank purchase?
-                if hist[2] == "tank" and hist[7] < 4: # no payouts for meta 4 or 5 tanks
-                    payout_base = settings.options["PAYOUT_MULTIPLIERS"]["Purchase"]
-                    meta_mutiplier = settings.options["PAYOUT_BY_META"][hist[7]-1]
-                    payout = int(round(payout_base * meta_mutiplier,0))
+                if hist[2] == "tank":
+                    if hist[7] < 4: # no payouts for meta 4 or 5 tanks
+                        payout_base = settings.options["PAYOUT_MULTIPLIERS"]["Purchase"]
+                        meta_mutiplier = settings.options["PAYOUT_BY_META"][hist[7]-1]
+                        payout = int(round(payout_base * meta_mutiplier,0))
                 elif hist[2] == "moe": # payout for MOE gain
                     if hist[4] == 1: payout_base = settings.options["PAYOUT_MULTIPLIERS"]["1st Mark"]
                     elif hist[4] == 2: payout_base = settings.options["PAYOUT_MULTIPLIERS"]["2nd Mark"]
