@@ -52,9 +52,14 @@ def player(account_id):
 @app.route('/meta_tanks', methods=['GET', 'POST'])
 def meta_tanks():
     tank_list = getDictFromListWithIndex(stats.GetAllTanks(10, [16161]), 4)
+    sorted_tanklist = {}
+    for tanks in tank_list:
+        tanks = list(tanks)
+        tanks[1] = sorted(tanks[1], key=lambda x: ([-ord(c) for c in x[2]], x[3]))
+        sorted_tanklist[tanks[0]] = tanks[1]
     return render_template(
         "set_meta_tanks.html",
-        tank_list = tank_list
+        tank_list = sorted_tanklist
         )
 
 @app.route('/set_meta_tanks', methods=['POST'])
