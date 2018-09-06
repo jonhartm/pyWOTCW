@@ -248,6 +248,10 @@ def UpdateClanMembers(skip_marks=False):
         # Load the stats for all of the members pulled in with the API
         UpdateMemberTankStats([x["account_id"] for x in API_data], skip_marks)
 
+        # Delete any entries in the MOEHistory table for anyone that just joined the clan
+        cur.executemany('DELETE FROM MOEHistory WHERE account_id = ?', [[x[0]] for x in inserts])
+        conn.commit()
+
 # params: tier - integer between 1 and 10
 #         ids - (optional) a list of integers to include in addition to the tier selected
 # returns: a list of strings coorresponding to tank ids that meet the parameters
