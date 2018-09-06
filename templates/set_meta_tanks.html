@@ -12,12 +12,12 @@
     Drag tanks between lists and press "Submit" at the bottom when done.
   </p>
   <div class=list-container>
-    {% for rank, tanks in tank_list%}
+    {% for rank, tanks in tank_list.items() %}
       <div class=tank-list-container>
         <h1>Tier {{rank}}</h1>
         <ul class=sortable>
           {% for tank in tanks %}
-            <li>
+            <li class="{{tank[2]}}">
               <span>{{tank[3]}}</span>
               <input type=hidden value={{tank[0]}}>
             </li>

@@ -60,6 +60,7 @@
     &.no-rank {
       color: $light-grey;
     }
+
   }
 }
 
@@ -86,7 +87,6 @@
     width: 220px;
 
     li {
-      background-color: $white;
       border: 1px solid $light-grey;
       border-radius: 4px;
       font-size: 1.2em;
@@ -98,6 +98,26 @@
       &:hover {
         background-color: $dark-grey;
         cursor: move;
+      }
+
+      &.heavyTank {
+        background-color: $color-scale-5;
+      }
+
+      &.mediumTank {
+        background-color: $color-scale-4;
+      }
+
+      &.lightTank {
+        background-color: $color-scale-3;
+      }
+
+      &.TD {
+        background-color: $color-scale-2;
+      }
+
+      &.SPG {
+        background-color: $color-scale-1;
       }
     }
   }

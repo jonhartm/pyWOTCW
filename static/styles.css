@@ -112,7 +112,6 @@
   width: 220px;
 }
 .list-container .sortable li {
-  background-color: #fff;
   border: 1px solid #eee;
   border-radius: 4px;
   font-size: 1.2em;
@@ -124,6 +123,21 @@
 .list-container .sortable li:hover {
   background-color: #ccc;
   cursor: move;
+}
+.list-container .sortable li.heavyTank {
+  background-color: #503d82;
+}
+.list-container .sortable li.mediumTank {
+  background-color: #2f679a;
+}
+.list-container .sortable li.lightTank {
+  background-color: #2b5c17;
+}
+.list-container .sortable li.TD {
+  background-color: #c6c600;
+}
+.list-container .sortable li.SPG {
+  background-color: #f00;
 }
 
 .controls {
