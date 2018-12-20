@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, make_response
-import sys, os
+import argparse, os, sys
 from os import path, getenv
 from dotenv import load_dotenv
 
@@ -90,43 +90,49 @@ def mark_payment():
     resp = make_response(json.dumps(data))
     return resp
 
-if __name__=="__main__":
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "-reset":
-            if len(sys.argv) > 2:
-                if sys.argv[2] == "-tanks":
-                    database.ResetTanks(True)
-                elif sys.argv[2] == "-stats":
-                    database.ResetMemberStats()
-                elif sys.argv[2] == "-marks":
-                    database.ResetMOEHistory()
-            else:
-                if input("This will reset the entire database - are you sure? (y/n): ").lower() == "y":
-                    database.InitializeAll()
+# create the parser object
+parser = argparse.ArgumentParser(
+    description="RDDT WoT Stats",
+    epilog="Run without arguments for Flask application"
+    )
 
-        elif sys.argv[1] == "-update":
-            if len(sys.argv) > 2:
-                if sys.argv[2] == "-skipMOE":
-                    database.UpdateClanMembers(True)
-            else:
-                print("Updating database...")
-                database.UpdateClanMembers()
-        elif sys.argv[1] == "-stats":
-            if len(sys.argv) == 3:
-                print(stats.GetIndivStats(sys.argv[2]))
-            else:
-                print(stats.GetStats())
-        else:
-            tank_list = getDictFromListWithIndex(stats.GetAllTanks(10, [16161]), 4)
+arg_group = parser.add_mutually_exclusive_group()
 
-            sorted_tanklist = {}
-            for tanks in tank_list:
-                tanks = list(tanks)
-                tanks[1] = sorted(tanks[1], key=lambda x: (x[2], x[3]))
-                sorted_tanklist[tanks[0]] = tanks[1]
-            print(sorted_tanklist)
+# command line arguments
+arg_group.add_argument("-reset",
+    nargs='*',
+    help = "Drop one or more tables and recreate. WARNING: Will cause data loss.",
+    choices = ["tanks", "stats", "marks", "all"])
+arg_group.add_argument("-update",
+    nargs='?',
+    const="all",
+    help = "Update the database",
+    choices = ["skipMOE", "all"])
+arg_group.add_argument("-stats", nargs=1, help = "Retrieve stats on a particular item in the database.")
+arg_group.add_argument("-test", nargs=1, help = "For use with testing. Probably doesn't do anything.")
 
+args = parser.parse_args()
 
-
+if args.reset != None:
+    if 'all' in args.reset:
+        if query_yes_no("This will reset all tables in the database. Are you sure?"):
+            database.InitializeAll()
     else:
-        app.run(debug=True)
+        if query_yes_no("This will reset the following tables: {}. Are you sure?".format(', '.join([t.upper() for t in args.reset]))):
+            if 'tanks' in args.reset:
+                database.ResetTanks(True)
+            if 'stats' in args.reset:
+                database.ResetMemberStats()
+            if 'marks' in args.reset:
+                database.ResetMOEHistory()
+elif args.update != None:
+    if 'all' in args.update:
+        database.UpdateClanMembers()
+    if 'skipMOE' in args.update:
+        database.UpdateClanMembers(True)
+elif args.stats != None:
+    print("stats")
+elif args.test != None:
+    print("test")
+else:
+    app.run(debug=True)
