@@ -136,6 +136,7 @@ def GetIndivStats(account_id):
             SPGDmg,
             updated_at
         FROM StatHistory WHERE account_id = ?
+        ORDER BY updated_at DESC
         '''
         cur.execute(query, [account_id])
         for hist in [x for x in cur.fetchall()]:
