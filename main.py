@@ -110,6 +110,7 @@ arg_group.add_argument("-update",
     choices = ["skipMOE", "all"])
 arg_group.add_argument("-stats", nargs=1, help = "Retrieve stats on a particular item in the database.")
 arg_group.add_argument("-test", nargs=1, help = "For use with testing. Probably doesn't do anything.")
+arg_group.add_argument("-flask", help = "Start the flask application on a local machine.", action='store_true')
 
 args = parser.parse_args()
 
@@ -134,5 +135,5 @@ elif args.stats != None:
     print("stats")
 elif args.test != None:
     print("test")
-else:
+elif args.flask != None:
     app.run(debug=True)
