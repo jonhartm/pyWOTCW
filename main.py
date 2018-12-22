@@ -135,5 +135,5 @@ elif args.stats != None:
     print("stats")
 elif args.test != None:
     print("test")
-elif args.flask != None:
+elif args.flask:
     app.run(debug=True)
