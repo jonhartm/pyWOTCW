@@ -167,6 +167,30 @@ def GetIndivStats(account_id):
                 },
                 "updated":hist[6]
             })
+        # update the history dictionary by adding in the changes between each pair of stats
+        # we need to iterate through each pair of stats - so stop 1 less than the length
+        for x in range(len(stats["history"])-1):
+            # slice the stats based on x - we want 2 in each slice
+            # they should be sorted by date already - 0 index is most recent
+            stat_comp = stats["history"][0+x:2+x]
+
+            # iterate through each of the keys
+            # just specify the dict here - it's easier than if-elsing to find the LT key
+            for k,v in {
+                            "overall":"dmg",
+                            "HT":"dmg",
+                            "MT":"dmg",
+                            "LT":"spots",
+                            "TD":"dmg",
+                            "SPG":"dmg"
+                        }.items():
+                # don't bother if the older stat doesn't have anything for this type
+                if stat_comp[0][k][v] is not None:
+                    new = stat_comp[0][k][v]
+                    old = stat_comp[1][k][v]
+
+                    # add a key to the new dict based on the total change
+                    stats["history"][x][k]['diff'] = new-old
     return stats
 
 # Gets a list of tanks owned by the provided player
