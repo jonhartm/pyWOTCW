@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, make_response
-import argparse, os, sys
+import argparse, os, sys, json
 from os import path, getenv
 from dotenv import load_dotenv
 
 import settings
 import database
-import json
 import get_stats as stats
 import sqlite3 as sqlite
 from util import *
@@ -132,7 +131,7 @@ elif args.update != None:
     if 'skipMOE' in args.update:
         database.UpdateClanMembers(True)
 elif args.stats != None:
-    print("stats")
+    print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
 elif args.test != None:
     print("test")
 elif args.flask:
