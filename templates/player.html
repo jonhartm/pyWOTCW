@@ -3,6 +3,7 @@
 <head>
   <title>Statistics For {{name}}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 </head>
 <body>
   <h1 class="title-text">Clan War Statistics for {{name}}</h1>
@@ -19,12 +20,114 @@
     <th>Date</th>
     {% for stat in stat_hist %}
     <tr>
-      <td class="rank-{{stat['overall'].rank}} same-first-col">{{stat['overall'].dmg}}</td>
-      <td class="rank-{{stat['HT'].rank}}">{{stat['HT'].dmg}}</td>
-      <td class="rank-{{stat['MT'].rank}}">{{stat['MT'].dmg}}</td>
-      <td class="rank-{{stat['LT'].rank}}">{{stat['LT'].spots}}</td>
-      <td class="rank-{{stat['SPG'].rank}}">{{stat['SPG'].dmg}}</td>
-      <td class="rank-{{stat['TD'].rank}}">{{stat['TD'].dmg}}</td>
+      <td class="rank-{{stat['overall'].rank}} same-first-col">
+        {{stat['overall'].dmg}}
+        {%if stat['overall'].diff is defined %}
+          {% if stat['overall'].diff > 0 %}
+            <span class="stat_up">
+              (<i class="fas fa-caret-up"></i>
+              {{stat['overall'].diff}})
+            </span>
+          {% elif stat['overall'].diff < 0 %}
+            <span class="stat_down">
+              (<i class="fas fa-caret-down"></i>
+              {{stat['overall'].diff}})
+            </span>
+          {% else %}
+            <span class="stat_none"> (-) </span>
+          {% endif %}
+        {% endif %}
+      </td>
+      <td class="rank-{{stat['HT'].rank}}">
+        {{stat['HT'].dmg}}
+        {%if stat['HT'].diff is defined %}
+          {% if stat['HT'].diff > 0 %}
+            <span class="stat_up">
+              (<i class="fas fa-caret-up"></i>
+              {{stat['HT'].diff}})
+            </span>
+          {% elif stat['HT'].diff < 0 %}
+            <span class="stat_down">
+              (<i class="fas fa-caret-down"></i>
+              {{stat['HT'].diff}})
+            </span>
+          {% else %}
+            <span class="stat_none"> (-) </span>
+          {% endif %}
+        {% endif %}
+      </td>
+      <td class="rank-{{stat['MT'].rank}}">
+        {{stat['MT'].dmg}}
+        {%if stat['MT'].diff is defined %}
+          {% if stat['MT'].diff > 0 %}
+            <span class="stat_up">
+              (<i class="fas fa-caret-up"></i>
+              {{stat['MT'].diff}})
+            </span>
+          {% elif stat['MT'].diff < 0 %}
+            <span class="stat_down">
+              (<i class="fas fa-caret-down"></i>
+              {{stat['MT'].diff}})
+            </span>
+          {% else %}
+            <span class="stat_none"> (-) </span>
+          {% endif %}
+        {% endif %}
+      </td>
+      <td class="rank-{{stat['LT'].rank}}">
+        {{stat['LT'].spots}}
+        {%if stat['LT'].diff is defined %}
+          {% if stat['LT'].diff > 0 %}
+            <span class="stat_up">
+              (<i class="fas fa-caret-up"></i>
+              {{stat['LT'].diff}})
+            </span>
+          {% elif stat['LT'].diff < 0 %}
+            <span class="stat_down">
+              (<i class="fas fa-caret-down"></i>
+              {{stat['LT'].diff}})
+            </span>
+          {% else %}
+            <span class="stat_none"> (-) </span>
+          {% endif %}
+        {% endif %}
+      </td>
+      <td class="rank-{{stat['SPG'].rank}}">
+        {{stat['SPG'].dmg}}
+        {%if stat['SPG'].diff is defined %}
+          {% if stat['SPG'].diff > 0 %}
+            <span class="stat_up">
+              (<i class="fas fa-caret-up"></i>
+              {{stat['SPG'].diff}})
+            </span>
+          {% elif stat['SPG'].diff < 0 %}
+            <span class="stat_down">
+              (<i class="fas fa-caret-down"></i>
+              {{stat['SPG'].diff}})
+            </span>
+          {% else %}
+            <span class="stat_none"> (-) </span>
+          {% endif %}
+        {% endif %}
+      </td>
+      <td class="rank-{{stat['TD'].rank}}">
+        {{stat['TD'].dmg}}
+        {%if stat['TD'].diff is defined %}
+          {% if stat['TD'].diff > 0 %}
+            <span class="stat_up">
+              (<i class="fas fa-caret-up"></i>
+              {{stat['TD'].diff}})
+            </span>
+          {% elif stat['TD'].diff < 0 %}
+            <span class="stat_down">
+              (<i class="fas fa-caret-down"></i>
+              {{stat['TD'].diff}})
+            </span>
+          {% else %}
+            <span class="stat_none"> (-) </span>
+          {% endif %}
+        {% endif %}
+      </td>
       <td>{{stat['updated']}}</td>
     </tr>
     {% endfor %}
