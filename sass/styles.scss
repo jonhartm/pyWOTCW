@@ -60,8 +60,20 @@
     &.no-rank {
       color: $light-grey;
     }
-
   }
+}
+
+// color in the stat diff spans
+.stat-up {
+  color: $green;
+}
+
+.stat-down {
+  color: $red;
+}
+
+.stat-none {
+  color: $dark-grey;
 }
 
 .list-container {
