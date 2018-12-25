@@ -185,7 +185,7 @@ def GetIndivStats(account_id):
                             "SPG":"dmg"
                         }.items():
                 # don't bother if the older stat doesn't have anything for this type
-                if stat_comp[0][k][v] is not None:
+                if stat_comp[1][k][v] is not None:
                     new = stat_comp[0][k][v]
                     old = stat_comp[1][k][v]
 
