@@ -190,7 +190,7 @@ def GetIndivStats(account_id):
                     old = stat_comp[1][k][v]
 
                     # add a key to the new dict based on the total change
-                    stats["history"][x][k]['diff'] = new-old
+                    stats["history"][x][k]['diff'] = round(new-old, 2)
     return stats
 
 # Gets a list of tanks owned by the provided player
