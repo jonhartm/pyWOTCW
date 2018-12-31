@@ -18,7 +18,8 @@ def GetStats():
         	SPGDmg,
             HTHitPer,
             MTHitPer,
-            TDHitPer
+            TDHitPer,
+            perWins
         FROM StatHistory
         	JOIN Members ON StatHistory.account_id = Members.account_id
         WHERE updated_at = (
@@ -72,6 +73,10 @@ def GetStats():
                     "dmg":p[7],
                     "rank":GetRank(p[7], settings.options["DMG_BREAKS"])
                 }
+
+            if p[11] is not None:
+                player['winPer'] = p[11]
+
             stats[p[0]] = player
     return stats
 
