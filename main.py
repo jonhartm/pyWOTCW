@@ -139,7 +139,10 @@ elif args.delete != None:
         database.DeleteLastUpdate()
         print("Last Update Removed")
 elif args.stats != None:
-    print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
+    if args.stats[0] == 'all':
+        print(stats.GetStats())
+    else:
+        print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
 elif args.test != None:
     # REMOVE THIS SECTION AFTER 1 USE
     # alter SQL tables in place to avoid data loss
