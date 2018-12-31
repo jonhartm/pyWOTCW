@@ -19,7 +19,7 @@ def GetStats():
             HTHitPer,
             MTHitPer,
             TDHitPer,
-            perWins
+            ROUND(perWins * 100,2)
         FROM StatHistory
         	JOIN Members ON StatHistory.account_id = Members.account_id
         WHERE updated_at = (
