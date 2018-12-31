@@ -150,6 +150,7 @@ def ResetMemberStats():
             'spotting' INTEGER,
             'hit_percent' INTEGER,
             'moe' INTEGER,
+            'wins' INTEGER,
 
             CONSTRAINT account
                 FOREIGN KEY (account_id)
@@ -283,7 +284,15 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
     stats_url = "https://api.worldoftanks.com/wot/tanks/stats/"
     stats_params = {
     "application_id": getenv("WG_APP_ID"),
-    "fields": "tank_id, globalmap.battles, globalmap.damage_dealt, globalmap.spotted, globalmap.survived_battles, globalmap.piercings, globalmap.hits",
+    "fields": """
+        tank_id,
+        globalmap.battles,
+        globalmap.damage_dealt,
+        globalmap.spotted,
+        globalmap.survived_battles,
+        globalmap.piercings,
+        globalmap.hits,
+        globalmap.wins""",
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -371,7 +380,8 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 stat["globalmap"]["damage_dealt"],
                 light_rating,
                 pierce_percent,
-                marks
+                marks,
+                stat["globalmap"]["wins"]
             ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
@@ -382,7 +392,7 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         # Clear the table
         cur.execute("DELETE FROM MemberStats")
 
-        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?)", inserts)
 
         if not skip_marks:
             cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
