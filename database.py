@@ -501,3 +501,13 @@ def AddStatHistory():
 
         print("Dropping avgStats temporary table...")
         DropTable("avgStats", cur)
+
+# Delete the last update from the StatsHistory table
+def DeleteLastUpdate():
+    with GetConnection() as conn:
+        cur = conn.cursor()
+        # check if we qualify based on the most recent stat history and the interval from the .env file
+        statment = '''
+        DELETE FROM StatHistory WHERE updated_at = (SELECT MAX(updated_at) FROM StatHistory)
+        '''
+        cur.execute(statment)

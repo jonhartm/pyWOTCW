@@ -107,6 +107,10 @@ arg_group.add_argument("-update",
     const="all",
     help = "Update the database",
     choices = ["skipMOE", "all"])
+arg_group.add_argument("-delete",
+    nargs=1,
+    help = "Delete specific sets of data from the SQL Database.",
+    choices = ["LastUpdate"])
 arg_group.add_argument("-stats", nargs=1, help = "Retrieve stats on a particular item in the database.")
 arg_group.add_argument("-test", nargs=1, help = "For use with testing. Probably doesn't do anything.")
 arg_group.add_argument("-flask", help = "Start the flask application on a local machine.", action='store_true')
@@ -130,6 +134,10 @@ elif args.update != None:
         database.UpdateClanMembers()
     if 'skipMOE' in args.update:
         database.UpdateClanMembers(True)
+elif args.delete != None:
+    if 'LastUpdate' in args.delete:
+        database.DeleteLastUpdate()
+        print("Last Update Removed")
 elif args.stats != None:
     print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
 elif args.test != None:
