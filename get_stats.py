@@ -19,7 +19,8 @@ def GetStats():
             HTHitPer,
             MTHitPer,
             TDHitPer,
-            ROUND(perWins * 100,2)
+            ROUND(perWins * 100,2),
+            battles
         FROM StatHistory
         	JOIN Members ON StatHistory.account_id = Members.account_id
         WHERE updated_at = (
@@ -76,6 +77,9 @@ def GetStats():
 
             if p[11] is not None:
                 player['winPer'] = p[11]
+
+            if p[12] is not None:
+                player['battles'] = p[12]
 
             stats[p[0]] = player
     return stats

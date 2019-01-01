@@ -21,6 +21,7 @@
   <th>TD Pen%</th>
   <th>SPG Dmg</th>
   <th>CW Win %</th>
+  <th>CW Battles</th>
   <!-- <th>Attendance</th>
   <th>Following Calls</th> -->
   {% for id, player in players.items() %}
@@ -100,7 +101,11 @@
     <td>
       {{player.winPer}}
     </td>
+    <td>
+      {{player.battles}}
+    </td>
     {% else %}
+    <td class="no-rank">No Battles</td>
     <td class="no-rank">No Battles</td>
     {% endif %}
 
