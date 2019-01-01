@@ -144,13 +144,6 @@ elif args.stats != None:
     else:
         print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
 elif args.test != None:
-    # REMOVE THIS SECTION AFTER 1 USE
-    # alter SQL tables in place to avoid data loss
-    with database.GetConnection() as conn:
-        cur = conn.cursor()
-        statment = '''
-        ALTER TABLE StatHistory ADD perWins REAL
-        '''
-        cur.execute(statment)
+    print("test")
 elif args.flask:
     app.run(debug=True)
