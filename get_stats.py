@@ -76,10 +76,16 @@ def GetStats():
                 }
 
             if p[11] is not None:
-                player['winPer'] = p[11]
+                player['winPer'] = {
+                    "per":p[11],
+                    "rank":GetRank(p[11], settings.options["WIN_RATE_BREAKS"])
+                }
 
             if p[12] is not None:
-                player['battles'] = p[12]
+                player['battles'] = {
+                    "count":p[12],
+                    "rank":GetRank(p[12], settings.options["BATTLE_COUNT_BREAKS"])
+                }
 
             stats[p[0]] = player
     return stats

@@ -98,11 +98,11 @@
     {% endif %}
 
     {% if player.winPer %}
-    <td>
-      {{player.winPer}}
+    <td class="rank-{{player.winPer.rank}}">
+      {{player.winPer.per}}
     </td>
-    <td>
-      {{player.battles}}
+    <td class="rank-{{player.battles.rank}}">
+      {{player.battles.count}}
     </td>
     {% else %}
     <td class="no-rank">No Battles</td>
