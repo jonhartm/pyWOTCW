@@ -122,6 +122,7 @@ def ResetClan():
             TDHitPer INTEGER,
         	SPGDmg INTEGER,
         	updated_at TIME,
+            perWins REAL,
 
         	PRIMARY KEY (account_id, updated_at),
             CONSTRAINT account
