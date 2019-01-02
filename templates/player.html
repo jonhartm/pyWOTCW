@@ -17,6 +17,8 @@
     <th>Light Tanks</th>
     <th>Self Propelled Guns</th>
     <th>Tank Destroyers</th>
+    <th>CW Win Rate</th>
+    <th>Battles</th>
     <th>Date</th>
     {% for stat in stat_hist %}
     <tr>
@@ -128,6 +130,16 @@
           {% endif %}
         {% endif %}
       </td>
+
+      {% if stat['perWins'].percent != None %}
+      <td class="rank-{{stat['perWins'].rank}}">
+        {{stat['perWins'].percent}}
+      </td>
+      {% else %}
+        <td>None</td>
+      {% endif %}
+
+
       <td>{{stat['updated']}}</td>
     </tr>
     {% endfor %}
@@ -159,6 +171,7 @@
       <table class="ratings-table">
         <th>Tank</th>
         <th>CW Battles</th>
+        <th>CW Win %</th>
         {% if type == "lightTank" %}
           <th>Light Tank Rating </th>
         {% else %}
@@ -176,6 +189,9 @@
             {% endif %}
           </td>
           <td>{{stat['battles']}}</td>
+          <td class="rank-{{stat['winPercentRank']}}">
+            {{stat['winPercent']}}
+          </td>
           {% if type == "lightTank" %}
             <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
           {% else %}
