@@ -137,7 +137,9 @@ def GetIndivStats(account_id):
             LTSpots,
             TDDmg,
             SPGDmg,
-            updated_at
+            updated_at,
+            perWins,
+            battles
         FROM StatHistory WHERE account_id = ?
         ORDER BY updated_at DESC
         '''
@@ -168,7 +170,12 @@ def GetIndivStats(account_id):
                     "dmg":hist[5],
                     "rank":GetRank(hist[5], settings.options["DMG_BREAKS"])
                 },
-                "updated":hist[6]
+                "updated":hist[6],
+                "perWins":{
+                    "percent":hist[7],
+                    "rank":GetRank(hist[7], settings.options["WIN_RATE_BREAKS"])
+                },
+                "battles":hist[8]
             })
         # update the history dictionary by adding in the changes between each pair of stats
         # we need to iterate through each pair of stats - so stop 1 less than the length
