@@ -115,22 +115,17 @@ def GetIndivStats(account_id):
         '''
         cur.execute(query, [account_id])
         for tank in [x for x in cur.fetchall()]:
-            if tank[1] == "lightTank":
-                stats["by_tank"][tank[1]].append({
-                    "name":tank[0],
-                    "battles":tank[2],
-                    "avgSpot":tank[4],
-                    "spotRank":GetRank(tank[4], settings.options["SPOT_BREAKS"])
-                })
-            else:
-                stats["by_tank"][tank[1]].append({
-                    "name":tank[0],
-                    "battles":tank[2],
-                    "avgDmg":tank[3],
-                    "dmgRank":GetRank(tank[3], settings.options["DMG_BREAKS"]),
-                    "hitPercent":tank[5],
-                    "hitPercentRank":GetRank(tank[5], settings.options["HIT_PERCENT_BREAKS"])
-                })
+            stats["by_tank"][tank[1]].append({
+                "name":tank[0],
+                "battles":tank[2],
+                "avgDmg":tank[3],
+                "dmgRank":GetRank(tank[3], settings.options["DMG_BREAKS"]),
+                "avgSpot":tank[4],
+                "spotRank":GetRank(tank[4], settings.options["SPOT_BREAKS"]),
+                "hitPercent":tank[5],
+                "hitPercentRank":GetRank(tank[5], settings.options["HIT_PERCENT_BREAKS"])
+            })
+
         query = '''
         SELECT
             avgDmg,
