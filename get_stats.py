@@ -148,7 +148,7 @@ def GetIndivStats(account_id):
             TDDmg,
             SPGDmg,
             updated_at,
-            perWins,
+            perWins*100,
             battles
         FROM StatHistory WHERE account_id = ?
         ORDER BY updated_at DESC
@@ -202,7 +202,8 @@ def GetIndivStats(account_id):
                             "MT":"dmg",
                             "LT":"spots",
                             "TD":"dmg",
-                            "SPG":"dmg"
+                            "SPG":"dmg",
+                            "perWins":"percent"
                         }.items():
                 # don't bother if the older stat doesn't have anything for this type
                 if stat_comp[1][k][v] is not None:
