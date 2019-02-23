@@ -148,7 +148,7 @@ def GetIndivStats(account_id):
             TDDmg,
             SPGDmg,
             updated_at,
-            perWins*100,
+            ROUND(perWins*100, 3),
             battles
         FROM StatHistory WHERE account_id = ?
         ORDER BY updated_at DESC
