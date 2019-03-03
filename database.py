@@ -342,9 +342,9 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 pierce_percent = 0
 
             try:
-                light_rating = round((stat["globalmap"]["survived_battles"]/stat["globalmap"]["battles"])+(stat["globalmap"]["spotted"]/stat["globalmap"]["battles"]), 2)
+                avg_spotting = round(stat["globalmap"]["spotted"]/stat["globalmap"]["battles"], 2)
             except:
-                light_rating = 0
+                avg_spotting = 0
 
             marks = 0
             for x in API_moe_data:
@@ -380,7 +380,7 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 stat["tank_id"],
                 stat["globalmap"]["battles"],
                 stat["globalmap"]["damage_dealt"],
-                light_rating,
+                avg_spotting,
                 pierce_percent,
                 marks,
                 stat["globalmap"]["wins"]
