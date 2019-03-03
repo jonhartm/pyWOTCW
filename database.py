@@ -153,6 +153,13 @@ def ResetMemberStats():
             'hit_percent' INTEGER,
             'moe' INTEGER,
             'wins' INTEGER,
+            'avg_damage_assisted_radio' INTEGER,
+            'avg_damage_assisted_track' INTEGER,
+            'avg_damage_blocked' INTEGER,
+            'explosion_hits' INTEGER,
+            'explosion_hits_received' INTEGER,
+            'no_damage_direct_hits_received' INTEGER,
+            'piercings_received' INTEGER,
 
             CONSTRAINT account
                 FOREIGN KEY (account_id)
@@ -294,7 +301,16 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         globalmap.survived_battles,
         globalmap.piercings,
         globalmap.hits,
-        globalmap.wins""",
+        globalmap.wins,
+        globalmap.avg_damage_assisted_radio,
+        globalmap.avg_damage_assisted_track,
+        globalmap.avg_damage_blocked,
+        globalmap.explosion_hits,
+        globalmap.explosion_hits_received,
+        globalmap.frags,
+        globalmap.no_damage_direct_hits_received,
+        globalmap.piercings_received
+        """,
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -376,14 +392,21 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 ])
 
             inserts.append([
-                id,
-                stat["tank_id"],
-                stat["globalmap"]["battles"],
-                stat["globalmap"]["damage_dealt"],
-                avg_spotting,
-                pierce_percent,
-                marks,
-                stat["globalmap"]["wins"]
+                id,                                                 # account_id
+                stat["tank_id"],                                    # tank_id
+                stat["globalmap"]["battles"],                       # battles
+                stat["globalmap"]["damage_dealt"],                  # damage_dealt
+                avg_spotting,                                       # spotting
+                pierce_percent,                                     # hit_percet
+                marks,                                              # moe
+                stat["globalmap"]["wins"],                          # wins
+                stat["globalmap"]["avg_damage_assisted_radio"],     # avg_damage_assisted_radio
+                stat["globalmap"]["avg_damage_blocked"],            # avg_damage_blocked
+                stat["globalmap"]["explosion_hits"],                # explosion_hits
+                stat["globalmap"]["explosion_hits_received"],       # explosion_hits_received
+                stat["globalmap"]["frags"],                         # frags
+                stat["globalmap"]["no_damage_direct_hits_received"],# no_damage_direct_hits_received
+                stat["globalmap"]["piercings_received"]             # piercings_received
             ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
@@ -394,7 +417,7 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         # Clear the table
         cur.execute("DELETE FROM MemberStats")
 
-        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", inserts)
 
         if not skip_marks:
             cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
