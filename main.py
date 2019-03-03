@@ -89,6 +89,13 @@ def mark_payment():
     resp = make_response(json.dumps(data))
     return resp
 
+@app.route('/define_settings')
+def define_settings():
+    return render_template(
+        'settings.html',
+        options = settings.options
+    )
+
 # create the parser object
 parser = argparse.ArgumentParser(
     description="RDDT WoT Stats",
