@@ -146,11 +146,17 @@ elif args.stats != None:
 elif args.test != None:
     print("test")
     # REMOVE THIS SECTION AFTER 1 USE
-    # alter SQL tables in place to avoid data loss
+    # alter SQL tables - one shot
     with database.GetConnection() as conn:
         cur = conn.cursor()
         statment = '''
-        ALTER TABLE StatHistory ADD battles INTEGER
+        ALTER TABLE MemberStats ADD avg_damage_assisted_radio INTEGER;
+        ALTER TABLE MemberStats ADD avg_damage_assisted_track INTEGER;
+        ALTER TABLE MemberStats ADD avg_damage_blocked INTEGER;
+        ALTER TABLE MemberStats ADD explosion_hits INTEGER;
+        ALTER TABLE MemberStats ADD explosion_hits_received INTEGER;
+        ALTER TABLE MemberStats ADD no_damage_direct_hits_received INTEGER;
+        ALTER TABLE MemberStats ADD piercings_received INTEGER;
         '''
         cur.execute(statment)
 elif args.flask:
