@@ -5,7 +5,7 @@
 
 from os import path, getenv
 import sqlite3 as sqlite
-import csv
+import urllib, csv
 from datetime import datetime, timedelta
 from util import *
 from caching import *
@@ -89,7 +89,6 @@ def UpdateTankMetaRanks():
         statement = 'UPDATE Tanks SET meta=? WHERE tank_id=?'
         cur.executemany(statement, updates)
         conn.commit()
-
 
 # drops all data about clan members and re-fills from API calls
 # basically a full reset minus the tanks call.
@@ -185,6 +184,41 @@ def ResetMOEHistory():
         print("Creating Table 'MOEHistory'")
         cur.execute(statement)
 
+def ResetWN8Expected():
+    with GetConnection() as conn:
+        cur = conn.cursor()
+        DropTable("wn8_expected", cur)
+        statement = '''
+        CREATE TABLE "wn8_expected" (
+            'IDNum' INTEGER NOT NULL PRIMARY KEY,
+            'expDef' REAL,
+            'expFrag' REAL,
+            'expSpot' REAL,
+            'expDamage' REAL,
+            'expWinRate' REAL
+        );
+        '''
+        cur.execute(statement)
+
+        # fetch the current wn8 expected values
+        url = "https://static.modxvm.com/wn8-data-exp/json/wn8exp.json"
+        response = urllib.request.urlopen(url)
+        data = json.loads(response.read())['data']
+
+        inserts = []
+        for i in data:
+            inserts.append([
+                i['IDNum'],
+                i['expDef'],
+                i['expFrag'],
+                i['expSpot'],
+                i['expDamage'],
+                i['expWinRate']
+            ])
+        print("Populating Table 'wn8_expected'")
+        cur.executemany('INSERT INTO wn8_expected VALUES (?,?,?,?,?,?)', inserts)
+        conn.commit()
+
 def MarkMOEPayment(id, payment):
     with GetConnection() as conn:
         cur = conn.cursor()
@@ -195,7 +229,6 @@ def MarkMOEPayment(id, payment):
         '''
         cur.execute(query, [payment, id])
         conn.commit()
-
 
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
 # Compares the retrieved list with the current database. New members are added, missing members
