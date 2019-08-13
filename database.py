@@ -464,9 +464,11 @@ def AddStatHistory():
         CREATE TABLE avgStats (
         	account_id INTEGER,
         	type TEXT,
-        	avgDmg INTEGER,
-        	avgSpot INTEGER,
-            avgHitPercent INTEGER
+        	avgDmg REAL,
+        	avgSpot REAL,
+            avgHitPercent REAL,
+			winPercent REAL,
+			battles INTEGER
         );
         '''
         cur.execute(statement)
@@ -479,7 +481,9 @@ def AddStatHistory():
         		type,
         		SUM(damage_dealt)/SUM(battles) AS avgDmg,
         		ROUND(AVG(spotting)*1.0,2) AS avgSpot,
-                ROUND(AVG(hit_percent),1) AS avgHitPercent
+                ROUND(AVG(hit_percent),1) AS avgHitPercent,
+                ROUND(SUM(wins)*1.0/SUM(battles)*1.0, 2) AS winPercent,
+                SUM(battles) as battles
         	FROM (SELECT * FROM MemberStats WHERE battles > 5) AS Stats
         		JOIN Tanks ON Tanks.tank_id = Stats.tank_id
         	GROUP BY account_id, type;
@@ -490,8 +494,8 @@ def AddStatHistory():
         statement = '''
         INSERT INTO StatHistory
         	SELECT
-        		Members.account_id,
-            	Overall.avgDmg,
+            	Members.account_id,
+            	Overall_limited.avgDmg,
             	HTstats.avgDmg AS HTdmg,
             	HTstats.avgHitPercent AS HTHitPer,
             	MTstats.avgDmg AS MTdmg,
@@ -500,30 +504,40 @@ def AddStatHistory():
             	TDstats.avgDmg AS TDdmg,
             	TDStats.avgHitPercent AS TDHitPer,
             	SPGstats.avgdmg AS SPGdmg,
-            	Date() AS updated_at
-        	FROM Members
-        		LEFT JOIN (
-        			SELECT
-        				account_id,
-        				SUM(damage_dealt)/SUM(battles) AS avgDmg
-        			FROM (SELECT * FROM MemberStats WHERE battles > 5)
-        			GROUP BY account_id
-        		) AS Overall ON Members.account_id = Overall.account_id
-        		LEFT OUTER JOIN avgStats as HTstats ON
-        			Members.account_id = HTstats.account_id
-        			and HTstats.type = "heavyTank"
-        		LEFT OUTER JOIN avgStats as MTstats ON
-        			Members.account_id = MTstats.account_id
-        			and MTstats.type = "mediumTank"
-        		LEFT OUTER JOIN avgStats as LTstats ON
-        			Members.account_id = LTstats.account_id
-        			and LTstats.type = "lightTank"
-        		LEFT OUTER JOIN avgStats as TDstats ON
-        			Members.account_id = TDstats.account_id
-        			and TDstats.type = "TD"
-        		LEFT OUTER JOIN avgStats as SPGstats ON
-        			Members.account_id = SPGstats.account_id
-        			and SPGstats.type = "SPG"
+            	Date() AS updated_at,
+            	Overall.winPercent,
+            	Overall.battles
+            FROM Members
+            	LEFT JOIN (
+            		SELECT
+            			account_id,
+            			SUM(damage_dealt)/SUM(battles) AS avgDmg
+            		FROM (SELECT * FROM MemberStats WHERE battles > 5)
+            		GROUP BY account_id
+            	) AS Overall_limited ON Members.account_id = Overall_limited.account_id
+            	LEFT JOIN (
+            		SELECT
+            			account_id,
+            			ROUND(SUM(wins)*1.0/SUM(battles)*1.0, 2) AS winPercent,
+            			SUM(battles) as battles
+            		FROM MemberStats
+            		GROUP BY account_id
+            	) AS Overall ON Members.account_id = Overall.account_id
+            	LEFT OUTER JOIN avgStats as HTstats ON
+            		Members.account_id = HTstats.account_id
+            		and HTstats.type = "heavyTank"
+            	LEFT OUTER JOIN avgStats as MTstats ON
+            		Members.account_id = MTstats.account_id
+            		and MTstats.type = "mediumTank"
+            	LEFT OUTER JOIN avgStats as LTstats ON
+            		Members.account_id = LTstats.account_id
+            		and LTstats.type = "lightTank"
+            	LEFT OUTER JOIN avgStats as TDstats ON
+            		Members.account_id = TDstats.account_id
+            		and TDstats.type = "TD"
+            	LEFT OUTER JOIN avgStats as SPGstats ON
+            		Members.account_id = SPGstats.account_id
+            		and SPGstats.type = "SPG"
         '''
         cur.execute(statement)
         print("Added StatHistory row for {} players".format(cur.rowcount))
