@@ -144,11 +144,26 @@ def ResetMemberStats():
         CREATE TABLE "MemberStats" (
             'account_id' INTEGER NOT NULL,
             'tank_id' INTEGER NOT NULL,
-            'battles' INTEGER,
-            'damage_dealt' INTEGER,
-            'spotting' INTEGER,
-            'hit_percent' INTEGER,
             'moe' INTEGER,
+            'cw_battles' INTEGER,
+            'cw_damage_dealt' INTEGER,
+            'cw_spotting' INTEGER,
+            'cw_hit_percent' INTEGER,
+            'cw_wins' INTEGER,
+            'cw_avg_damage_assisted_radio' INTEGER,
+            'cw_avg_damage_assisted_track' INTEGER,
+            'cw_avg_damage_blocked' INTEGER,
+            'cw_explosion_hits' INTEGER,
+            'cw_explosion_hits_received' INTEGER,
+            'cw_no_damage_direct_hits_recieved' INTEGER,
+            'cw_piercings_recieved' INTEGER,
+            'all_dropped_capture_points' INTEGER,
+            'all_frags' INTEGER,
+            'all_spotted' INTEGER,
+            'all_damage_dealt' INTEGER,
+            'all_winrate' INTEGER,
+            'all_battles' INTEGER,
+            'wn8' INTEGER,
 
             CONSTRAINT account
                 FOREIGN KEY (account_id)
@@ -316,7 +331,16 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
     stats_url = "https://api.worldoftanks.com/wot/tanks/stats/"
     stats_params = {
     "application_id": getenv("WG_APP_ID"),
-    "fields": "tank_id, globalmap",
+    "fields": '''
+        tank_id,
+        globalmap,
+        all.dropped_capture_points,
+        all.frags,
+        all.spotted,
+        all.damage_dealt,
+        all.wins,
+        all.battles
+    ''',
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -400,11 +424,11 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
             inserts.append([
                 id,
                 stat["tank_id"],
+                marks,
                 stat["globalmap"]["battles"],
                 stat["globalmap"]["damage_dealt"],
                 light_rating,
                 pierce_percent,
-                marks,
                 stat["globalmap"]["wins"],
                 stat["globalmap"]["avg_damage_assisted_radio"],
                 stat["globalmap"]["avg_damage_assisted_track"],
@@ -412,7 +436,13 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 stat["globalmap"]["explosion_hits"],
                 stat["globalmap"]["explosion_hits_received"],
                 stat["globalmap"]["no_damage_direct_hits_received"],
-                stat["globalmap"]["piercings_received"]
+                stat["globalmap"]["piercings_received"],
+                stat["all"]["dropped_capture_points"],
+                stat["all"]["frags"],
+                stat["all"]["spotted"],
+                stat["all"]["damage_dealt"],
+                stat["all"]["wins"],
+                stat["all"]["battles"]
             ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
@@ -423,8 +453,10 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         # Clear the table
         cur.execute("DELETE FROM MemberStats")
 
-        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)", inserts)
 
+        # Calculate the WN8 for each player's tank based on the data we just pulled
+        # and save it in a temp table
         if not skip_marks:
             cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
         conn.commit()
@@ -477,16 +509,16 @@ def AddStatHistory():
         statement = '''
         INSERT INTO avgStats
         	SELECT
-        		account_id,
-        		type,
-        		SUM(damage_dealt)/SUM(battles) AS avgDmg,
-        		ROUND(AVG(spotting)*1.0,2) AS avgSpot,
-                ROUND(AVG(hit_percent),1) AS avgHitPercent,
-                ROUND(SUM(wins)*1.0/SUM(battles)*1.0, 2) AS winPercent,
-                SUM(battles) as battles
-        	FROM (SELECT * FROM MemberStats WHERE battles > 5) AS Stats
-        		JOIN Tanks ON Tanks.tank_id = Stats.tank_id
-        	GROUP BY account_id, type;
+            	account_id,
+            	type,
+            	SUM(cw_damage_dealt)/SUM(cw_battles) AS avgDmg,
+            	ROUND(AVG(cw_spotting)*1.0,2) AS avgSpot,
+            	ROUND(AVG(cw_hit_percent),1) AS avgHitPercent,
+            	ROUND(SUM(cw_wins)*1.0/SUM(cw_battles)*1.0, 2) AS winPercent,
+            	SUM(cw_battles) as battles
+            FROM (SELECT * FROM MemberStats WHERE cw_battles > 5) AS Stats
+            	JOIN Tanks ON Tanks.tank_id = Stats.tank_id
+            GROUP BY account_id, type;
             '''
         cur.execute(statement)
 
