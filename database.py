@@ -457,6 +457,61 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
 
         # Calculate the WN8 for each player's tank based on the data we just pulled
         # and save it in a temp table
+        print("Calculating per Tank WN8...")
+        DropTable("wn8_calcs", cur)
+        statement = '''
+        CREATE TABLE wn8_calcs AS
+        	SELECT
+        		account_id,
+        		tank_id,
+        		ROUND(980*rDAMAGEc + 210*rDAMAGEc*rFRAGc + 155*rFRAGc*rSPOTc + 75*rDEFc*rFRAGc + 145*MIN(1.8,rWINc),0) as wn8
+        	FROM
+        	(
+        		SELECT
+        			account_id,
+        			tank_id,
+        			MAX(0,(rWIN-0.71)/(1-0.71)) as rWINc,
+        			MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) as rDAMAGEc,
+        			MAX(0, MIN(MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) + 0.2, (rFRAG - 0.12) / (1 - 0.12))) as rFRAGc,
+        			MAX(0, MIN(MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) + 0.1, (rSPOT - 0.38) / (1 - 0.38))) as rSPOTc,
+        			MAX(0, MIN(MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) + 0.1, (rDEF - 0.10) / (1 - 0.10))) as rDEFc
+        		FROM
+        		(
+        			SELECT
+        				account_id,
+        				tank_id,
+        				all_avg_damage_dealt/expDamage as rDAMAGE,
+        				all_avg_spotted/expSpot as rSPOT,
+        				all_avg_frags/expFrag as rFRAG,
+        				all_avg_dropped_capture_points/expDef as rDEF,
+        				(all_avg_winrate*100)/expWinRate as rWIN
+        			FROM (
+        					SELECT
+        						account_id,
+        						tank_id,
+        						(all_dropped_capture_points*1.0)/(all_battles*1.0) as all_avg_dropped_capture_points,
+        						(all_frags*1.0)/(all_battles*1.0) as all_avg_frags,
+        						(all_spotted*1.0)/(all_battles*1.0) as all_avg_spotted,
+        						(all_damage_dealt*1.0)/(all_battles*1.0) as all_avg_damage_dealt,
+        						(all_winrate*1.0)/(all_battles*1.0) as all_avg_winrate
+        					FROM MemberStats
+        					) as MemberStats
+        			INNER JOIN wn8_expected
+        				ON wn8_expected.IDNum = MemberStats.tank_id
+        		)
+        	)
+        '''
+        cur.execute(statement)
+        statement = '''
+        UPDATE MemberStats
+            SET wn8 = (
+            	SELECT wn8 FROM wn8_calcs
+            	WHERE wn8_calcs.account_id = MemberStats.account_id
+            		AND wn8_calcs.tank_id = MemberStats.tank_id)
+        '''
+        cur.execute(statement)
+        DropTable("wn8_calcs", cur)
+
         if not skip_marks:
             cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
         conn.commit()
@@ -543,15 +598,15 @@ def AddStatHistory():
             	LEFT JOIN (
             		SELECT
             			account_id,
-            			SUM(damage_dealt)/SUM(battles) AS avgDmg
-            		FROM (SELECT * FROM MemberStats WHERE battles > 5)
+            			SUM(cw_damage_dealt)/SUM(cw_battles) AS avgDmg
+            		FROM (SELECT * FROM MemberStats WHERE cw_battles > 5)
             		GROUP BY account_id
             	) AS Overall_limited ON Members.account_id = Overall_limited.account_id
             	LEFT JOIN (
             		SELECT
             			account_id,
-            			ROUND(SUM(wins)*1.0/SUM(battles)*1.0, 2) AS winPercent,
-            			SUM(battles) as battles
+            			ROUND(SUM(cw_wins)*1.0/SUM(cw_battles)*1.0, 2) AS winPercent,
+            			SUM(cw_battles) as battles
             		FROM MemberStats
             		GROUP BY account_id
             	) AS Overall ON Members.account_id = Overall.account_id
