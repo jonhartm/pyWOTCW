@@ -18,7 +18,8 @@ def GetStats():
         	SPGDmg,
             HTHitPer,
             MTHitPer,
-            TDHitPer
+            TDHitPer,
+            wn8
         FROM StatHistory
         	JOIN Members ON StatHistory.account_id = Members.account_id
         WHERE updated_at = (
@@ -34,6 +35,8 @@ def GetStats():
             player = {
                 "nickname":p[1]
             }
+
+            player['wn8'] = p[11]
 
             if p[2] is not None:
                 player['overall'] = {

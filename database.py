@@ -593,7 +593,8 @@ def AddStatHistory():
             	SPGstats.avgdmg AS SPGdmg,
             	Date() AS updated_at,
             	Overall.winPercent,
-            	Overall.battles
+            	Overall.battles,
+                Overall.wn8
             FROM Members
             	LEFT JOIN (
             		SELECT
@@ -606,7 +607,8 @@ def AddStatHistory():
             		SELECT
             			account_id,
             			ROUND(SUM(cw_wins)*1.0/SUM(cw_battles)*1.0, 2) AS winPercent,
-            			SUM(cw_battles) as battles
+            			SUM(cw_battles) as battles,
+                        ROUND(AVG(wn8)) as wn8
             		FROM MemberStats
             		GROUP BY account_id
             	) AS Overall ON Members.account_id = Overall.account_id
