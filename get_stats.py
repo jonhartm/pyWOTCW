@@ -102,14 +102,16 @@ def GetIndivStats(account_id):
         SELECT
         	Tanks.name,
         	Tanks.type,
-        	battles,
-        	ROUND(damage_dealt*1.0/battles, 2) AS avgDmg,
-        	spotting AS avgSpotting,
-            hit_percent
+        	cw_battles,
+        	ROUND(cw_damage_dealt*1.0/cw_battles, 2) AS avgDmg,
+        	cw_spotting AS avgSpotting,
+        	cw_hit_percent,
+        	wn8,
+            all_battles
         FROM MemberStats
         	JOIN Tanks ON MemberStats.tank_id = Tanks.tank_id
         WHERE account_id = ?
-        ORDER BY type, battles DESC
+        ORDER BY type, cw_battles DESC
         '''
         cur.execute(query, [account_id])
         for tank in [x for x in cur.fetchall()]:
@@ -120,7 +122,9 @@ def GetIndivStats(account_id):
                 "avgSpot":tank[4],
                 "spotRank":GetRank(tank[4], settings.options["SPOT_BREAKS"]),
                 "hitPercent":tank[5],
-                "hitPercentRank":GetRank(tank[5], settings.options["HIT_PERCENT_BREAKS"])
+                "hitPercentRank":GetRank(tank[5], settings.options["HIT_PERCENT_BREAKS"]),
+                "wn8":tank[6],
+                "all_battles":tank[7]
             })
             
         query = '''
@@ -131,7 +135,8 @@ def GetIndivStats(account_id):
             LTSpots,
             TDDmg,
             SPGDmg,
-            updated_at
+            updated_at,
+            wn8
         FROM StatHistory WHERE account_id = ?
         ORDER BY updated_at DESC
         '''
@@ -162,7 +167,8 @@ def GetIndivStats(account_id):
                     "dmg":hist[5],
                     "rank":GetRank(hist[5], settings.options["DMG_BREAKS"])
                 },
-                "updated":hist[6]
+                "updated":hist[6],
+                "wn8":hist[7]
             })
         # update the history dictionary by adding in the changes between each pair of stats
         # we need to iterate through each pair of stats - so stop 1 less than the length

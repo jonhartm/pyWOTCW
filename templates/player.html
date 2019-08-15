@@ -17,6 +17,7 @@
     <th>Light Tanks</th>
     <th>Self Propelled Guns</th>
     <th>Tank Destroyers</th>
+    <th>Avg Tier 10 WN8</th>
     <th>Date</th>
     {% for stat in stat_hist %}
     <tr>
@@ -128,6 +129,7 @@
           {% endif %}
         {% endif %}
       </td>
+      <td>{{stat['wn8']}}</td>
       <td>{{stat['updated']}}</td>
     </tr>
     {% endfor %}
@@ -158,6 +160,8 @@
     {% else %}
       <table class="ratings-table">
         <th>Tank</th>
+        <th>Pub Battles</th>
+        <th>WN8</th>
         <th>CW Battles</th>
         {% if type == "lightTank" %}
           <th>Light Tank Rating </th>
@@ -175,6 +179,8 @@
             *
             {% endif %}
           </td>
+          <td>{{stat['all_battles']}}</td>
+          <td>{{stat['wn8']}}</td>
           <td>{{stat['battles']}}</td>
           {% if type == "lightTank" %}
             <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
