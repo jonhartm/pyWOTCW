@@ -17,8 +17,7 @@
     <th>Light Tanks</th>
     <th>Self Propelled Guns</th>
     <th>Tank Destroyers</th>
-    <th>CW Win Rate</th>
-    <th>Battles</th>
+    <th>Avg Tier 10 WN8</th>
     <th>Date</th>
     {% for stat in stat_hist %}
     <tr>
@@ -130,31 +129,7 @@
           {% endif %}
         {% endif %}
       </td>
-
-      {% if stat['perWins'].percent != None %}
-        <td class="rank-{{stat['perWins'].rank}}">
-          {{stat['perWins'].percent}}
-          {%if stat['perWins'].diff is defined %}
-            {% if stat['perWins'].diff > 0 %}
-              <span class="stat-up">
-                (<i class="fas fa-caret-up"></i>
-                {{stat['perWins'].diff}})
-              </span>
-            {% elif stat['perWins'].diff < 0 %}
-              <span class="stat-down">
-                (<i class="fas fa-caret-down"></i>
-                {{stat['perWins'].diff}})
-              </span>
-            {% else %}
-              <span class="stat-none"> (-) </span>
-            {% endif %}
-          {% endif %}
-        </td>
-      {% else %}
-        <td>None</td>
-      {% endif %}
-
-      <td>{{stat['battles']}}</td>
+      <td class="rank-{{stat['wn8'].rank}}">{{stat['wn8'].value}}</td>
       <td>{{stat['updated']}}</td>
     </tr>
     {% endfor %}
@@ -185,6 +160,8 @@
     {% else %}
       <table class="ratings-table">
         <th>Tank</th>
+        <th>Pub Battles</th>
+        <th>WN8</th>
         <th>CW Battles</th>
         <th>CW Win %</th>
         {% if type == "lightTank" %}
@@ -203,16 +180,18 @@
             *
             {% endif %}
           </td>
+          <td class="rank-{{stat['pub_battles'].rank}}">{{stat['pub_battles'].value}}</td>
+          <td class="rank-{{stat['wn8'].rank}}">{{stat['wn8'].value}}</td>
           <td>{{stat['battles']}}</td>
           <td class="rank-{{stat['winPercentRank']}}">
             {{stat['winPercent']}}
           </td>
           {% if type == "lightTank" %}
-            <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
+            <td class="rank-{{stat['spotting'].rank}}">{{stat['spotting'].value}}</td>
           {% else %}
             <td class="rank-{{stat['dmgRank']}}">{{stat['avgDmg']}}</td>
             {% if type != "SPG" %}
-              <td class="rank-{{stat['hitPercentRank']}}">{{stat['hitPercent']}}</td>
+              <td class="rank-{{stat['hitPercent'].rank}}">{{stat['hitPercent'].value}}</td>
             {% endif %}
           {% endif %}
         </tr>

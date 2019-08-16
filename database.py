@@ -5,7 +5,7 @@
 
 from os import path, getenv
 import sqlite3 as sqlite
-import csv
+import urllib, csv
 from datetime import datetime, timedelta
 from util import *
 from caching import *
@@ -90,7 +90,6 @@ def UpdateTankMetaRanks():
         cur.executemany(statement, updates)
         conn.commit()
 
-
 # drops all data about clan members and re-fills from API calls
 # basically a full reset minus the tanks call.
 def ResetClan():
@@ -147,19 +146,26 @@ def ResetMemberStats():
         CREATE TABLE "MemberStats" (
             'account_id' INTEGER NOT NULL,
             'tank_id' INTEGER NOT NULL,
-            'battles' INTEGER,
-            'damage_dealt' INTEGER,
-            'spotting' INTEGER,
-            'hit_percent' INTEGER,
             'moe' INTEGER,
-            'wins' INTEGER,
-            'avg_damage_assisted_radio' INTEGER,
-            'avg_damage_assisted_track' INTEGER,
-            'avg_damage_blocked' INTEGER,
-            'explosion_hits' INTEGER,
-            'explosion_hits_received' INTEGER,
-            'no_damage_direct_hits_received' INTEGER,
-            'piercings_received' INTEGER,
+            'cw_battles' INTEGER,
+            'cw_damage_dealt' INTEGER,
+            'cw_spotting' INTEGER,
+            'cw_hit_percent' INTEGER,
+            'cw_wins' INTEGER,
+            'cw_avg_damage_assisted_radio' INTEGER,
+            'cw_avg_damage_assisted_track' INTEGER,
+            'cw_avg_damage_blocked' INTEGER,
+            'cw_explosion_hits' INTEGER,
+            'cw_explosion_hits_received' INTEGER,
+            'cw_no_damage_direct_hits_recieved' INTEGER,
+            'cw_piercings_recieved' INTEGER,
+            'all_dropped_capture_points' INTEGER,
+            'all_frags' INTEGER,
+            'all_spotted' INTEGER,
+            'all_damage_dealt' INTEGER,
+            'all_winrate' INTEGER,
+            'all_battles' INTEGER,
+            'wn8' INTEGER,
 
             CONSTRAINT account
                 FOREIGN KEY (account_id)
@@ -186,6 +192,8 @@ def ResetMOEHistory():
             date_confirmed TIME,
             payout INTEGER,
 
+            PRIMARY KEY (account_id, tank_id, achv_type)
+
             CONSTRAINT account
                 FOREIGN KEY (account_id)
                 REFERENCES Members(account_id)
@@ -194,6 +202,41 @@ def ResetMOEHistory():
         '''
         print("Creating Table 'MOEHistory'")
         cur.execute(statement)
+
+def ResetWN8Expected():
+    with GetConnection() as conn:
+        cur = conn.cursor()
+        DropTable("wn8_expected", cur)
+        statement = '''
+        CREATE TABLE "wn8_expected" (
+            'IDNum' INTEGER NOT NULL PRIMARY KEY,
+            'expDef' REAL,
+            'expFrag' REAL,
+            'expSpot' REAL,
+            'expDamage' REAL,
+            'expWinRate' REAL
+        );
+        '''
+        cur.execute(statement)
+
+        # fetch the current wn8 expected values
+        url = "https://static.modxvm.com/wn8-data-exp/json/wn8exp.json"
+        response = urllib.request.urlopen(url)
+        data = json.loads(response.read())['data']
+
+        inserts = []
+        for i in data:
+            inserts.append([
+                i['IDNum'],
+                i['expDef'],
+                i['expFrag'],
+                i['expSpot'],
+                i['expDamage'],
+                i['expWinRate']
+            ])
+        print("Populating Table 'wn8_expected'")
+        cur.executemany('INSERT INTO wn8_expected VALUES (?,?,?,?,?,?)', inserts)
+        conn.commit()
 
 def MarkMOEPayment(id, payment):
     with GetConnection() as conn:
@@ -205,7 +248,6 @@ def MarkMOEPayment(id, payment):
         '''
         cur.execute(query, [payment, id])
         conn.commit()
-
 
 # Makes a request to the WOT API for the current members of the clan specified in the .env file
 # Compares the retrieved list with the current database. New members are added, missing members
@@ -230,8 +272,9 @@ def UpdateClanMembers(skip_marks=False):
             "game": "wot"
         }
         API_data = Cache.CheckCache_API(
-            url,
-            params,
+            url=url,
+            params=params,
+            limit_param_keys=['clan_id'],
             max_age=dt.timedelta(hours=23)
         )["data"][getenv("CLAN_ID")]["members"]
         print("Clan details found for {} members...".format(len(API_data)))
@@ -293,24 +336,16 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
     stats_url = "https://api.worldoftanks.com/wot/tanks/stats/"
     stats_params = {
     "application_id": getenv("WG_APP_ID"),
-    "fields": """
+    "fields": '''
         tank_id,
-        globalmap.battles,
-        globalmap.damage_dealt,
-        globalmap.spotted,
-        globalmap.survived_battles,
-        globalmap.piercings,
-        globalmap.hits,
-        globalmap.wins,
-        globalmap.avg_damage_assisted_radio,
-        globalmap.avg_damage_assisted_track,
-        globalmap.avg_damage_blocked,
-        globalmap.explosion_hits,
-        globalmap.explosion_hits_received,
-        globalmap.frags,
-        globalmap.no_damage_direct_hits_received,
-        globalmap.piercings_received
-        """,
+        globalmap,
+        all.dropped_capture_points,
+        all.frags,
+        all.spotted,
+        all.damage_dealt,
+        all.wins,
+        all.battles
+    ''',
     "in_garage": "1",
     "tank_id": ','.join(GetTankIDs(10, [16161]))
     }
@@ -330,8 +365,9 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         stats_params["account_id"] = str(id)
         # print("Loading member details for account id {}".format(id))
         API_stats_data = Cache.CheckCache_API(
-            stats_url,
-            stats_params,
+            url=stats_url,
+            params=stats_params,
+            limit_param_keys=['account_id'],
             max_age=dt.timedelta(hours=23),
             rate_limit=True
         )["data"][str(id)]
@@ -339,8 +375,9 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         # print("Loading member MOE details for account id {}".format(id))
         moe_params["account_id"] = str(id)
         API_moe_data = Cache.CheckCache_API(
-            moe_url,
-            moe_params,
+            url=moe_url,
+            params=moe_params,
+            limit_param_keys=['account_id'],
             max_age=dt.timedelta(hours=23),
             rate_limit=True
         )["data"][str(id)]
@@ -392,21 +429,27 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 ])
 
             inserts.append([
-                id,                                                 # account_id
-                stat["tank_id"],                                    # tank_id
-                stat["globalmap"]["battles"],                       # battles
-                stat["globalmap"]["damage_dealt"],                  # damage_dealt
-                avg_spotting,                                       # spotting
-                pierce_percent,                                     # hit_percet
-                marks,                                              # moe
-                stat["globalmap"]["wins"],                          # wins
-                stat["globalmap"]["avg_damage_assisted_radio"],     # avg_damage_assisted_radio
-                stat["globalmap"]["avg_damage_blocked"],            # avg_damage_blocked
-                stat["globalmap"]["explosion_hits"],                # explosion_hits
-                stat["globalmap"]["explosion_hits_received"],       # explosion_hits_received
-                stat["globalmap"]["frags"],                         # frags
-                stat["globalmap"]["no_damage_direct_hits_received"],# no_damage_direct_hits_received
-                stat["globalmap"]["piercings_received"]             # piercings_received
+                id,
+                stat["tank_id"],
+                marks,
+                stat["globalmap"]["battles"],
+                stat["globalmap"]["damage_dealt"],
+                light_rating,
+                pierce_percent,
+                stat["globalmap"]["wins"],
+                stat["globalmap"]["avg_damage_assisted_radio"],
+                stat["globalmap"]["avg_damage_assisted_track"],
+                stat["globalmap"]["avg_damage_blocked"],
+                stat["globalmap"]["explosion_hits"],
+                stat["globalmap"]["explosion_hits_received"],
+                stat["globalmap"]["no_damage_direct_hits_received"],
+                stat["globalmap"]["piercings_received"],
+                stat["all"]["dropped_capture_points"],
+                stat["all"]["frags"],
+                stat["all"]["spotted"],
+                stat["all"]["damage_dealt"],
+                stat["all"]["wins"],
+                stat["all"]["battles"]
             ])
     print("Found statistics on {} tanks...".format(len(inserts)))
 
@@ -417,7 +460,64 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         # Clear the table
         cur.execute("DELETE FROM MemberStats")
 
-        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", inserts)
+        cur.executemany("INSERT INTO MemberStats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)", inserts)
+
+        # Calculate the WN8 for each player's tank based on the data we just pulled
+        # and save it in a temp table
+        print("Calculating per Tank WN8...")
+        DropTable("wn8_calcs", cur)
+        statement = '''
+        CREATE TABLE wn8_calcs AS
+        	SELECT
+        		account_id,
+        		tank_id,
+        		ROUND(980*rDAMAGEc + 210*rDAMAGEc*rFRAGc + 155*rFRAGc*rSPOTc + 75*rDEFc*rFRAGc + 145*MIN(1.8,rWINc),0) as wn8
+        	FROM
+        	(
+        		SELECT
+        			account_id,
+        			tank_id,
+        			MAX(0,(rWIN-0.71)/(1-0.71)) as rWINc,
+        			MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) as rDAMAGEc,
+        			MAX(0, MIN(MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) + 0.2, (rFRAG - 0.12) / (1 - 0.12))) as rFRAGc,
+        			MAX(0, MIN(MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) + 0.1, (rSPOT - 0.38) / (1 - 0.38))) as rSPOTc,
+        			MAX(0, MIN(MAX(0, (rDAMAGE - 0.22) / (1 - 0.22) ) + 0.1, (rDEF - 0.10) / (1 - 0.10))) as rDEFc
+        		FROM
+        		(
+        			SELECT
+        				account_id,
+        				tank_id,
+        				all_avg_damage_dealt/expDamage as rDAMAGE,
+        				all_avg_spotted/expSpot as rSPOT,
+        				all_avg_frags/expFrag as rFRAG,
+        				all_avg_dropped_capture_points/expDef as rDEF,
+        				(all_avg_winrate*100)/expWinRate as rWIN
+        			FROM (
+        					SELECT
+        						account_id,
+        						tank_id,
+        						(all_dropped_capture_points*1.0)/(all_battles*1.0) as all_avg_dropped_capture_points,
+        						(all_frags*1.0)/(all_battles*1.0) as all_avg_frags,
+        						(all_spotted*1.0)/(all_battles*1.0) as all_avg_spotted,
+        						(all_damage_dealt*1.0)/(all_battles*1.0) as all_avg_damage_dealt,
+        						(all_winrate*1.0)/(all_battles*1.0) as all_avg_winrate
+        					FROM MemberStats
+        					) as MemberStats
+        			INNER JOIN wn8_expected
+        				ON wn8_expected.IDNum = MemberStats.tank_id
+        		)
+        	)
+        '''
+        cur.execute(statement)
+        statement = '''
+        UPDATE MemberStats
+            SET wn8 = (
+            	SELECT wn8 FROM wn8_calcs
+            	WHERE wn8_calcs.account_id = MemberStats.account_id
+            		AND wn8_calcs.tank_id = MemberStats.tank_id)
+        '''
+        cur.execute(statement)
+        DropTable("wn8_calcs", cur)
 
         if not skip_marks:
             cur.executemany("INSERT INTO MOEHistory VALUES (?,?,?,?,?,?,NULL,NULL)", moe_inserts)
@@ -458,9 +558,11 @@ def AddStatHistory():
         CREATE TABLE avgStats (
         	account_id INTEGER,
         	type TEXT,
-        	avgDmg INTEGER,
-        	avgSpot INTEGER,
-            avgHitPercent INTEGER
+        	avgDmg REAL,
+        	avgSpot REAL,
+            avgHitPercent REAL,
+			winPercent REAL,
+			battles INTEGER
         );
         '''
         cur.execute(statement)
@@ -469,14 +571,16 @@ def AddStatHistory():
         statement = '''
         INSERT INTO avgStats
         	SELECT
-        		account_id,
-        		type,
-        		SUM(damage_dealt)/SUM(battles) AS avgDmg,
-        		ROUND(AVG(spotting)*1.0,2) AS avgSpot,
-                ROUND(AVG(hit_percent),1) AS avgHitPercent
-        	FROM (SELECT * FROM MemberStats WHERE battles > 5) AS Stats
-        		JOIN Tanks ON Tanks.tank_id = Stats.tank_id
-        	GROUP BY account_id, type;
+            	account_id,
+            	type,
+            	SUM(cw_damage_dealt)/SUM(cw_battles) AS avgDmg,
+            	ROUND(AVG(cw_spotting)*1.0,2) AS avgSpot,
+            	ROUND(AVG(cw_hit_percent),1) AS avgHitPercent,
+            	ROUND(SUM(cw_wins)*1.0/SUM(cw_battles)*1.0, 2) AS winPercent,
+            	SUM(cw_battles) as battles
+            FROM (SELECT * FROM MemberStats WHERE cw_battles > 5) AS Stats
+            	JOIN Tanks ON Tanks.tank_id = Stats.tank_id
+            GROUP BY account_id, type;
             '''
         cur.execute(statement)
 
@@ -484,8 +588,8 @@ def AddStatHistory():
         statement = '''
         INSERT INTO StatHistory
         	SELECT
-        		Members.account_id,
-            	Overall.avgDmg,
+            	Members.account_id,
+            	Overall_limited.avgDmg,
             	HTstats.avgDmg AS HTdmg,
             	HTstats.avgHitPercent AS HTHitPer,
             	MTstats.avgDmg AS MTdmg,
@@ -495,33 +599,41 @@ def AddStatHistory():
             	TDStats.avgHitPercent AS TDHitPer,
             	SPGstats.avgdmg AS SPGdmg,
             	Date() AS updated_at,
-                Overall.perWins AS perWins,
-                Overall.battles AS battles
-        	FROM Members
-        		LEFT JOIN (
-        			SELECT
-        				account_id,
-        				SUM(damage_dealt)/SUM(battles) AS avgDmg,
-                        ROUND(SUM(wins)*1.0/SUM(battles)*1.0,3) AS perWins,
-                        SUM(battles) AS battles
-        			FROM (SELECT * FROM MemberStats WHERE battles >= 5)
-        			GROUP BY account_id
-        		) AS Overall ON Members.account_id = Overall.account_id
-        		LEFT OUTER JOIN avgStats as HTstats ON
-        			Members.account_id = HTstats.account_id
-        			and HTstats.type = "heavyTank"
-        		LEFT OUTER JOIN avgStats as MTstats ON
-        			Members.account_id = MTstats.account_id
-        			and MTstats.type = "mediumTank"
-        		LEFT OUTER JOIN avgStats as LTstats ON
-        			Members.account_id = LTstats.account_id
-        			and LTstats.type = "lightTank"
-        		LEFT OUTER JOIN avgStats as TDstats ON
-        			Members.account_id = TDstats.account_id
-        			and TDstats.type = "TD"
-        		LEFT OUTER JOIN avgStats as SPGstats ON
-        			Members.account_id = SPGstats.account_id
-        			and SPGstats.type = "SPG"
+            	Overall.winPercent,
+            	Overall.battles,
+                Overall.wn8
+            FROM Members
+            	LEFT JOIN (
+            		SELECT
+            			account_id,
+            			SUM(cw_damage_dealt)/SUM(cw_battles) AS avgDmg
+            		FROM (SELECT * FROM MemberStats WHERE cw_battles > 5)
+            		GROUP BY account_id
+            	) AS Overall_limited ON Members.account_id = Overall_limited.account_id
+            	LEFT JOIN (
+            		SELECT
+            			account_id,
+            			ROUND(SUM(cw_wins)*1.0/SUM(cw_battles)*1.0, 2) AS winPercent,
+            			SUM(cw_battles) as battles,
+                        ROUND(AVG(wn8)) as wn8
+            		FROM MemberStats
+            		GROUP BY account_id
+            	) AS Overall ON Members.account_id = Overall.account_id
+            	LEFT OUTER JOIN avgStats as HTstats ON
+            		Members.account_id = HTstats.account_id
+            		and HTstats.type = "heavyTank"
+            	LEFT OUTER JOIN avgStats as MTstats ON
+            		Members.account_id = MTstats.account_id
+            		and MTstats.type = "mediumTank"
+            	LEFT OUTER JOIN avgStats as LTstats ON
+            		Members.account_id = LTstats.account_id
+            		and LTstats.type = "lightTank"
+            	LEFT OUTER JOIN avgStats as TDstats ON
+            		Members.account_id = TDstats.account_id
+            		and TDstats.type = "TD"
+            	LEFT OUTER JOIN avgStats as SPGstats ON
+            		Members.account_id = SPGstats.account_id
+            		and SPGstats.type = "SPG"
         '''
         cur.execute(statement)
         print("Added StatHistory row for {} players".format(cur.rowcount))

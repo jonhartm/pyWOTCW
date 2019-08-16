@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 import settings
 import database
+from update import *
 import get_stats as stats
 import sqlite3 as sqlite
 from util import *
@@ -121,6 +122,7 @@ arg_group.add_argument("-delete",
 arg_group.add_argument("-stats", nargs=1, help = "Retrieve stats on a particular item in the database.")
 arg_group.add_argument("-test", nargs=1, help = "For use with testing. Probably doesn't do anything.")
 arg_group.add_argument("-flask", help = "Start the flask application on a local machine.", action='store_true')
+arg_group.add_argument("-update_app", help = "Update the application to a newer version.", action='store_true')
 
 args = parser.parse_args()
 
@@ -146,25 +148,10 @@ elif args.delete != None:
         database.DeleteLastUpdate()
         print("Last Update Removed")
 elif args.stats != None:
-    if args.stats[0] == 'all':
-        print(stats.GetStats())
-    else:
-        print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
+    print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
+elif args.update_app:
+    check_for_update()
 elif args.test != None:
-    print("test")
-    # REMOVE THIS SECTION AFTER 1 USE
-    # alter SQL tables - one shot
-    with database.GetConnection() as conn:
-        cur = conn.cursor()
-        statment = '''
-        ALTER TABLE MemberStats ADD avg_damage_assisted_radio INTEGER;
-        ALTER TABLE MemberStats ADD avg_damage_assisted_track INTEGER;
-        ALTER TABLE MemberStats ADD avg_damage_blocked INTEGER;
-        ALTER TABLE MemberStats ADD explosion_hits INTEGER;
-        ALTER TABLE MemberStats ADD explosion_hits_received INTEGER;
-        ALTER TABLE MemberStats ADD no_damage_direct_hits_received INTEGER;
-        ALTER TABLE MemberStats ADD piercings_received INTEGER;
-        '''
-        cur.execute(statment)
+    print("None")
 elif args.flask:
     app.run(debug=True)
