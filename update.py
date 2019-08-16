@@ -15,6 +15,7 @@ def check_for_update():
         if current_version < 1.1:
             print("Updating database to 1.1 ...")
             v_11_update()
+        print("(Make sure to manually update the version number in the .env file...)")
 
 def v_11_update():
     # pull the wn8 expected values
