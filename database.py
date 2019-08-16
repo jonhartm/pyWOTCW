@@ -270,8 +270,9 @@ def UpdateClanMembers(skip_marks=False):
             "game": "wot"
         }
         API_data = Cache.CheckCache_API(
-            url,
-            params,
+            url=url,
+            params=params,
+            limit_param_keys=['clan_id'],
             max_age=dt.timedelta(hours=23)
         )["data"][getenv("CLAN_ID")]["members"]
         print("Clan details found for {} members...".format(len(API_data)))
@@ -362,8 +363,9 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         stats_params["account_id"] = str(id)
         # print("Loading member details for account id {}".format(id))
         API_stats_data = Cache.CheckCache_API(
-            stats_url,
-            stats_params,
+            url=stats_url,
+            params=stats_params,
+            limit_param_keys=['account_id'],
             max_age=dt.timedelta(hours=23),
             rate_limit=True
         )["data"][str(id)]
@@ -371,8 +373,9 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
         # print("Loading member MOE details for account id {}".format(id))
         moe_params["account_id"] = str(id)
         API_moe_data = Cache.CheckCache_API(
-            moe_url,
-            moe_params,
+            url=moe_url,
+            params=moe_params,
+            limit_param_keys=['account_id'],
             max_age=dt.timedelta(hours=23),
             rate_limit=True
         )["data"][str(id)]

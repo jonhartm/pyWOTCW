@@ -14,6 +14,7 @@ class CacheFile():
         self.filename = filename
         self.API_cache = {}
         self.print_info = print_info
+        self.print_info = True
         self.last_request = dt.datetime.now()
         # Try to open the cache file if you can find it and load the json data into API_cache
         try:
@@ -82,14 +83,15 @@ class CacheFile():
     #         (optional) a timedelta for the age at which data would be considered stale
     #         (optional) a list of specific keys to store in the cache, which cuts down on access time for large cache files
     # returns: a dictionary of json, either pulled from the API or loaded from the cache
-    def CheckCache_API(self, url, params, max_age=None, keys=None, rate_limit=False, force_update=False):
+    def CheckCache_API(self, url, params, limit_param_keys=None, max_age=None, keys=None, rate_limit=False, force_update=False):
         param_keys = sorted(params.keys()) # sort the paramaters so we know they'll be in the same order even if they aren't in order in the dictionary attribute
         unique_ID = url # start creating the unique_ID with the URL
-        for k in param_keys:
-            if not("api" in k and "key" in k): # skip anything with the words "api" and "key"
-                unique_ID += "_" + k + "_" + str(params[k]).lower()
-        if keys is not None:
-            unique_ID += '_' + '_'.join(keys)
+        if limit_param_keys is not None:
+            unique_ID += '_' + '_'.join([p+"_"+params[p] for p in params if p in limit_param_keys])
+        else:
+            for k in param_keys:
+                if not("api" in k and "key" in k): # skip anything with the words "api" and "key"
+                    unique_ID += "_" + k + "_" + str(params[k]).lower()
 
         # check to see if this unique ID is stored in the cache, and if not, make a request and add it
         if unique_ID in self.API_cache:
