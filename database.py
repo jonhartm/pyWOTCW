@@ -434,7 +434,7 @@ def UpdateMemberTankStats(account_ids, skip_marks=False):
                 marks,
                 stat["globalmap"]["battles"],
                 stat["globalmap"]["damage_dealt"],
-                light_rating,
+                avg_spotting,
                 pierce_percent,
                 stat["globalmap"]["wins"],
                 stat["globalmap"]["avg_damage_assisted_radio"],

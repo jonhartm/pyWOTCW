@@ -19,6 +19,8 @@ def GetStats():
             HTHitPer,
             MTHitPer,
             TDHitPer,
+            winPercent,
+            battles,
             wn8
         FROM StatHistory
         	JOIN Members ON StatHistory.account_id = Members.account_id
@@ -37,8 +39,8 @@ def GetStats():
             }
 
             player['wn8'] = {
-                "value":p[11],
-                "rank":GetRank(p[11], settings.options["WN8_BREAKS"])
+                "value":p[13],
+                "rank":GetRank(p[13], settings.options["WN8_BREAKS"])
             }
 
             if p[2] is not None:
@@ -215,7 +217,7 @@ def GetIndivStats(account_id):
                             "LT":"spots",
                             "TD":"dmg",
                             "SPG":"dmg",
-                            "perWins":"percent"
+                            "wn8":"value"
                         }.items():
                 # don't bother if the older stat doesn't have anything for this type
                 if stat_comp[1][k][v] is not None:
