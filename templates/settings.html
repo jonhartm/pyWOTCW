@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Settings</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <table class="ratings-table">
+    <tr>
+      <th>Setting Name</th>
+      <th>1st Break</th>
+      <th>2nd Break</th>
+      <th>3rd Break</th>
+      <th>4th Break</th>
+    </tr>
+    {% for key, values in options.items() %}
+      {% if "BREAKS" in key %}
+        <tr>
+          <td>{{key}}</td>
+        {% for value in values %}
+          <th>
+            <input type="text" value="{{value}}" size="5" style="text-align:center"></input>
+          </th>
+        {% endfor %}
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+
+</body>
