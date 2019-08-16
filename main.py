@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 import settings
 import database
+from update import *
 import get_stats as stats
 import sqlite3 as sqlite
 from util import *
@@ -110,6 +111,7 @@ arg_group.add_argument("-update",
 arg_group.add_argument("-stats", nargs=1, help = "Retrieve stats on a particular item in the database.")
 arg_group.add_argument("-test", nargs=1, help = "For use with testing. Probably doesn't do anything.")
 arg_group.add_argument("-flask", help = "Start the flask application on a local machine.", action='store_true')
+arg_group.add_argument("-update_app", help = "Update the application to a newer version.", action='store_true')
 
 args = parser.parse_args()
 
@@ -132,7 +134,9 @@ elif args.update != None:
         database.UpdateClanMembers(True)
 elif args.stats != None:
     print(json.dumps(stats.GetIndivStats(args.stats[0]), indent=2))
+elif args.update_app:
+    check_for_update()
 elif args.test != None:
-    print("test")
+    print("None")
 elif args.flask:
     app.run(debug=True)
