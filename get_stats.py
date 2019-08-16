@@ -36,7 +36,10 @@ def GetStats():
                 "nickname":p[1]
             }
 
-            player['wn8'] = p[11]
+            player['wn8'] = {
+                "value":p[11],
+                "rank":GetRank(p[11], settings.options["WN8_BREAKS"])
+            }
 
             if p[2] is not None:
                 player['overall'] = {
@@ -119,14 +122,24 @@ def GetIndivStats(account_id):
                 "name":tank[0],
                 "battles":tank[2],
                 "avgDmg":tank[3],
-                "avgSpot":tank[4],
-                "spotRank":GetRank(tank[4], settings.options["SPOT_BREAKS"]),
-                "hitPercent":tank[5],
-                "hitPercentRank":GetRank(tank[5], settings.options["HIT_PERCENT_BREAKS"]),
-                "wn8":tank[6],
-                "all_battles":tank[7]
+                "spotting":{
+                    "value":tank[4],
+                    "rank":GetRank(tank[4], settings.options["SPOT_BREAKS"])
+                },
+                "hitPercent":{
+                    "value":tank[5],
+                    "rank":GetRank(tank[5], settings.options["HIT_PERCENT_BREAKS"])
+                },
+                "wn8":{
+                    "value":tank[6],
+                    "rank":GetRank(tank[6], settings.options["WN8_BREAKS"])
+                },
+                "pub_battles":{
+                    "value":tank[7],
+                    "rank":GetRank(tank[7], settings.options["PUB_BATTLE_BREAKS"])
+                }
             })
-            
+
         query = '''
         SELECT
             avgDmg,
@@ -168,7 +181,10 @@ def GetIndivStats(account_id):
                     "rank":GetRank(hist[5], settings.options["DMG_BREAKS"])
                 },
                 "updated":hist[6],
-                "wn8":hist[7]
+                "wn8":{
+                    "value":hist[7],
+                    "rank":GetRank(hist[7], settings.options["WN8_BREAKS"])
+                }
             })
         # update the history dictionary by adding in the changes between each pair of stats
         # we need to iterate through each pair of stats - so stop 1 less than the length

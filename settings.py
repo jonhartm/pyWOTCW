@@ -14,6 +14,8 @@ if not os.path.isfile(settings_file):
         "SPOT_BREAKS":[3.79,4.1,4.66,5.36],
         "ATTENDANCE_BREAKS":[.2,.4,.6,.8],
         "HIT_PERCENT_BREAKS":[60.3,64.8,69.2,73.2],
+        "WN8_BREAKS":[755,1315,1965,2525],
+        "PUB_BATTLE_BREAKS":[10,25,50,100],
         "META_TANK_RANKS":
         {
             5:[],

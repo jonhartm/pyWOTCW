@@ -26,7 +26,7 @@
   {% for id, player in players.items() %}
   <tr>
     <td><a href="/player/{{id}}">{{player.nickname}}</a></td>
-    <td>{{player.wn8}}</td>
+    <td class="rank-{{player.wn8.rank}}">{{player.wn8.value}}</td>
 
     {% if player.overall %}
     <td class="rank-{{player.overall.rank}}">

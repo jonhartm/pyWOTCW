@@ -129,7 +129,7 @@
           {% endif %}
         {% endif %}
       </td>
-      <td>{{stat['wn8']}}</td>
+      <td class="rank-{{stat['wn8'].rank}}">{{stat['wn8'].value}}</td>
       <td>{{stat['updated']}}</td>
     </tr>
     {% endfor %}
@@ -179,15 +179,15 @@
             *
             {% endif %}
           </td>
-          <td>{{stat['all_battles']}}</td>
-          <td>{{stat['wn8']}}</td>
+          <td class="rank-{{stat['pub_battles'].rank}}">{{stat['pub_battles'].value}}</td>
+          <td class="rank-{{stat['wn8'].rank}}">{{stat['wn8'].value}}</td>
           <td>{{stat['battles']}}</td>
           {% if type == "lightTank" %}
-            <td class="rank-{{stat['spotRank']}}">{{stat['avgSpot']}}</td>
+            <td class="rank-{{stat['spotting'].rank}}">{{stat['spotting'].value}}</td>
           {% else %}
             <td class="rank-{{stat['dmgRank']}}">{{stat['avgDmg']}}</td>
             {% if type != "SPG" %}
-              <td class="rank-{{stat['hitPercentRank']}}">{{stat['hitPercent']}}</td>
+              <td class="rank-{{stat['hitPercent'].rank}}">{{stat['hitPercent'].value}}</td>
             {% endif %}
           {% endif %}
         </tr>
