@@ -11,6 +11,7 @@
   </div>
   <table class="ratings-table">
   <th>Player</th>
+  <th>Avg Tier 10 WN8</th>
   <th>Overall Avg Dmg</th>
   <th>Heavy Dmg</th>
   <th>Heavy Pen%</th>
@@ -27,6 +28,7 @@
   {% for id, player in players.items() %}
   <tr>
     <td><a href="/player/{{id}}">{{player.nickname}}</a></td>
+    <td class="rank-{{player.wn8.rank}}">{{player.wn8.value}}</td>
 
     {% if player.overall %}
     <td class="rank-{{player.overall.rank}}">
