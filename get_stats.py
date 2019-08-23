@@ -19,7 +19,7 @@ def GetStats():
             HTHitPer,
             MTHitPer,
             TDHitPer,
-            winPercent,
+            ROUND(winPercent *100, 1) as winPercent,
             battles,
             wn8
         FROM StatHistory
